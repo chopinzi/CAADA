@@ -7,7 +7,7 @@ import re
 from jllutils.subutils import ncdf as ncio
 
 from . import readers, metadata, ancillary
-from .. import common_utils
+from .. import common_utils, common_ancillary
 from ..caad_typing import \
     pathlike as _pathlike, \
     scalarnum as _scalarnum, \
@@ -123,6 +123,10 @@ def _save_county_file(data_dict: dict, dates: np.ndarray, county_ids: np.ndarray
         county_names = ds.createVariable('county_name', str, county.name)
         for i, c in enumerate(county_ids):
             county_names[i] = ancillary.get_county_name(c)
+
+        # Add county bounds. Use state ID = 6 for California - this function is only intended for CA PEMS
+        # If used for other states, this will need updated.
+        common_ancillary.add_county_polys_to_ncdf(ds, county_ids=county_ids, state_ids=6, county_dimension='county_id')
 
         # Add the data variables
         for varkey, vararray in data_dict.items():

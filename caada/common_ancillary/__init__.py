@@ -1,0 +1,109 @@
+import geopandas as gpd
+import netCDF4 as ncdf
+import numpy as np
+import os
+from typing import Sequence
+
+from jllutils.subutils import ncdf as ncio
+
+_county_shapefile = os.path.join(os.path.dirname(__file__), 'county_shp_files', 'cb_2018_us_county_20m.shp')
+_county_gdf = gpd.read_file(_county_shapefile)
+_county_gdf.rename(columns=lambda s: s.lower(), inplace=True)
+_county_gdf['statefp'] = _county_gdf['statefp'].astype('int')
+_county_gdf['countyfp'] = _county_gdf['countyfp'].astype('int')
+
+_state_shapefile = os.path.join(os.path.dirname(__file__), 'state_shp_files', 'cb_2018_us_state_20m.shp')
+_state_gdf = gpd.read_file(_state_shapefile)
+_state_gdf.rename(columns=lambda s: s.lower(), inplace=True)
+_state_gdf.sort_values('name', inplace=True)
+_state_gdf['statefp'] = _state_gdf['statefp'].astype('int')
+
+
+def get_county_polygons(county_ids, state_ids):
+    if isinstance(state_ids, int):
+        state_ids = [state_ids] * len(county_ids)
+    elif len(state_ids) != len(county_ids):
+        raise ValueError('Either provide a single state ID for all counties (as an integer) or a sequence the same '
+                         'length as county_ids')
+
+    polys = []
+    for cid, sid in zip(county_ids, state_ids):
+        xx = (_county_gdf['statefp'] == sid) & (_county_gdf['countyfp'] == cid)
+        if xx.sum() != 1:
+            raise IndexError('Expected 1 match for state ID = {}, county ID = {}; instead got {}'
+                             .format(sid, cid, xx.sum()))
+        else:
+            polys.append(_county_gdf.loc[xx, 'geometry'].item())
+    return polys
+
+
+def get_state_polygons(state_ids, as_gdf=False):
+    if isinstance(state_ids, int):
+        state_ids = [state_ids]
+
+    polys = []
+    for sid in state_ids:
+        xx = _state_gdf['statefp'] == sid
+        if xx.sum() != 1:
+            raise IndexError('Expected 1 match for state ID = {}, instead got {}'.format(sid, xx.sum()))
+        elif as_gdf:
+            polys.append(_state_gdf.index[xx].item())
+        else:
+            polys.append(_state_gdf.loc[xx, 'geometry'].item())
+    if as_gdf:
+        return _state_gdf.loc[polys, :]
+    else:
+        return polys
+
+
+def geometry_to_lat_lon(geo):
+    if geo.geom_type == 'MultiPolygon':
+        lats = []
+        lons = []
+        for g in geo.geoms:
+            y, x = geometry_to_lat_lon(g)
+            lons.append(x)
+            lats.append(y)
+            lons.append(np.array([np.nan]))
+            lats.append(np.array([np.nan]))
+        # There will always be an extra NaN at the end we don't need to concatenate
+        lats = np.concatenate(lats[:-1], axis=0)
+        lons = np.concatenate(lons[:-1], axis=0)
+    elif geo.geom_type == 'Polygon':
+        lons, lats = zip(*geo.exterior.coords)
+        lons = np.array(lons)
+        lats = np.array(lats)
+    else:
+        raise NotImplementedError('Cannot convert geometry of type "{}"'.format(geo.geom_type))
+
+    return lats, lons
+
+
+def add_county_polys_to_ncdf(nch: ncdf.Dataset, county_ids: Sequence[int], state_ids: Sequence[int],
+                             county_dimension: str = 'county'):
+    polys = get_county_polygons(county_ids, state_ids)
+
+    # Convert to an array of lat/lon
+    poly_latlon = np.empty([len(polys), 2], object)
+    for i, p in enumerate(polys):
+        lat, lon = geometry_to_lat_lon(p)
+        poly_latlon[i, 0] = lat.astype('float32')
+        poly_latlon[i, 1] = lon.astype('float32')
+
+    # Create 2 variables: one for the county bounds lat/lon as numbers and one for the "well known text" representation
+    vlen_t = nch.createVLType(np.float32, 'county_bounds_vlen')
+    ncio.make_ncdim_helper(nch, 'bounds_coord', np.array([0, 1]),
+                           description='Index for shape bounds. 0 = latitude, 1 = longitude.')
+    bounds_var = nch.createVariable("county_bounds", vlen_t, (county_dimension, 'bounds_coord'))
+    bounds_var[:] = poly_latlon
+    bounds_var.setncattr('crs', str(_county_gdf.crs))
+    bounds_var.setncattr('description', "The latitude and longitude of each county's boundaries")
+    bounds_var.setncattr('note', 'If fill values are present, they indicate breaks between coordinates for unconnected polygons')
+
+    wkt_var = nch.createVariable('county_bounds_wkt', str, county_dimension)
+    for i, p in enumerate(polys):
+        # assume the polys are in the same order as the county IDs - the county IDs MUST be given in the order they
+        # are in the netCDF file
+        wkt_var[i] = p.to_wkt()
+    wkt_var.setncattr('crs', str(_county_gdf.crs))
+    wkt_var.setncattr('description', 'The county shape described in the CRS well known text format')
