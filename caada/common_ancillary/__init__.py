@@ -2,7 +2,9 @@ import geopandas as gpd
 import netCDF4 as ncdf
 import numpy as np
 import os
-from typing import Sequence
+import pandas as pd
+from typing import Sequence, Optional, Union
+from ..caada_typing import intseq
 
 from jllutils.subutils import ncdf as ncio
 
@@ -19,22 +21,60 @@ _state_gdf.sort_values('name', inplace=True)
 _state_gdf['statefp'] = _state_gdf['statefp'].astype('int')
 
 
-def get_county_polygons(county_ids, state_ids):
+def _standardize_input_ids(county_ids, state_ids):
+    if isinstance(county_ids, (int, type(None))):
+        county_ids = [county_ids]
+        if not isinstance(state_ids, int):
+            county_ids *= len(state_ids)
     if isinstance(state_ids, int):
         state_ids = [state_ids] * len(county_ids)
     elif len(state_ids) != len(county_ids):
         raise ValueError('Either provide a single state ID for all counties (as an integer) or a sequence the same '
                          'length as county_ids')
+    return county_ids, state_ids
 
+
+def get_county_polygons(county_ids: Optional[intseq], state_ids: Union[int, intseq]):
+    """Get a dataframe with the polygons or multipolygons representing county borders
+
+    The returned dataframe will have the county polygons for each county listed. `county_ids` and `state_ids` may both
+    be scalar integers or lists of integers. If both are lists, then then must be the same length. Each county is drawn
+    from the corresponding state in the list. If one is a scalar, it will be used for every element in the other, e.g.
+    if `state_ids = 6` then 6 will be used as the state for every county listed in `county_ids`. If you want two
+    counties from state 1 and three from state 2, then you would pass `county_ids = [a1, b1, c1, a2, b2]` and
+    `state_ids = [1, 1, 1, 2, 2]`.
+
+    Parameters
+    ----------
+    county_ids
+        The numeric census IDs of counties to get polygons for. May be an integer, `None`, or sequence of both. If
+        `None`, then all counties for each state listed will be returned. If `None` is given as an element of the
+        list, then all counties for the corresponding state are returned.
+
+    state_ids
+        The numeric census IDs of states that each county belongs in. These may not be `None` and must be an integer
+        or list of integers.
+
+    Returns
+    -------
+    List[Polygons]
+        The list of Shapely polygons corresponding to the counties requested.
+
+    """
+    gdf_subset = get_poly_gdf_subset(county_ids, state_ids)
+    return gdf_subset['geometry'].tolist()
+
+
+def get_poly_gdf_subset(county_ids: Optional[intseq], state_ids: Union[int, intseq]):
+    county_ids, state_ids = _standardize_input_ids(county_ids, state_ids)
     polys = []
     for cid, sid in zip(county_ids, state_ids):
-        xx = (_county_gdf['statefp'] == sid) & (_county_gdf['countyfp'] == cid)
-        if xx.sum() != 1:
-            raise IndexError('Expected 1 match for state ID = {}, county ID = {}; instead got {}'
-                             .format(sid, cid, xx.sum()))
-        else:
-            polys.append(_county_gdf.loc[xx, 'geometry'].item())
-    return polys
+        xx = (_county_gdf['statefp'] == sid)
+        if cid is not None:
+            xx &= (_county_gdf['countyfp'] == cid)
+
+        polys.append(_county_gdf.loc[xx, :])
+    return pd.concat(polys, axis=0)
 
 
 def get_state_polygons(state_ids, as_gdf=False):

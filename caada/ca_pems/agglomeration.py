@@ -3,12 +3,17 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 import re
+import time
 
 from jllutils.subutils import ncdf as ncio
+from jllutils.miscutils import ProgressMessage
 
 from . import readers, metadata, ancillary
 from .. import common_utils, common_ancillary
-from ..caad_typing import \
+from typing import Optional
+from ..caada_errors import \
+    DimensionError
+from ..caada_typing import \
     pathlike as _pathlike, \
     scalarnum as _scalarnum, \
     strseq as _strseq

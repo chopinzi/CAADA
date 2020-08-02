@@ -1,6 +1,6 @@
 import pandas as pd
 
-from ..caad_typing import pathlike as _pathlike
+from ..caada_typing import pathlike as _pathlike
 
 
 def read_pems_station_csv(csv_file: _pathlike) -> pd.DataFrame:

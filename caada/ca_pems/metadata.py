@@ -5,7 +5,7 @@ from typing import Sequence
 
 from . import readers, exceptions
 
-from ..caad_typing import \
+from ..caada_typing import \
     datetimelike as _datetimelike, \
     pathlike as _pathlike
 
