@@ -7,6 +7,7 @@ import time
 
 from jllutils.subutils import ncdf as ncio
 from jllutils.miscutils import ProgressMessage
+from jllutils import stats as jstats
 
 from . import readers, metadata, ancillary
 from .. import common_utils, common_ancillary
@@ -42,16 +43,22 @@ def agglomerate_by_country(pems_root: _pathlike, meta_root: _pathlike, save_path
         time_index, county_index = _init_county_file(nh, pems_root=pems_root, variables=variables, time_res=time_res,
                                                      min_percent_observed=min_percent_observed)
 
-        #pmsg = ProgressMessage(format='Loading file {idx}, {filename}: {action}', auto_advance=False)
-        file_idx = 0
+        # Create running means for the variables. We can use the internal sum at the end for the summed output, and the
+        # weights to determine which values to set to fill values
+        arr_shape = [county_index.size, time_index.size]
+        running_sums = {v: jstats.RunningMean(arr_shape) for v in variables}
+
+        # pmsg = ProgressMessage(format='Loading file {idx}, {filename}: {action}', auto_advance=False)
+        # file_idx = 0
         for stn_file, meta_dir in _iter_pems_files(pems_root, meta_root):
             #pmsg.print_message(file_idx, filename=stn_file.name, action='')
             stn_sum, stn_dates, stn_counties = _agglomerate_district_to_counties(
                 stn_file, meta_dir, time_res=time_res, variables=variables, min_percent_observed=min_percent_observed)
-            _insert_data_in_nc_file(nh=nh, data_dict=stn_sum, stn_times=stn_dates, stn_counties=stn_counties,
-                                    nc_times=time_index, nc_counties=county_index, stn_file=stn_file)
-        #pmsg.finish()
+            _insert_data_in_running_sums(sums=running_sums, data_dict=stn_sum, stn_times=stn_dates, stn_counties=stn_counties,
+                                         nc_times=time_index, nc_counties=county_index, stn_file=stn_file)
+        # pmsg.finish()
 
+        _insert_data_in_nc_file(nh, running_sums)
         time_elapsed = pd.Timedelta(seconds=time.time() - began_at)
         print('Finished writing traffic data to {} in {}'.format(save_path, time_elapsed))
 
@@ -204,12 +211,28 @@ def _match_subset_with_nc_dims(stn_times: np.ndarray, stn_counties: np.ndarray, 
     return xx_county, xx_time
 
 
-def _insert_data_in_nc_file(nh: ncdf.Dataset, data_dict: dict, stn_times: np.ndarray, stn_counties: np.ndarray,
-                            nc_times: pd.DatetimeIndex, nc_counties: np.ndarray, stn_file: Path):
-
+def _insert_data_in_running_sums(sums: dict, data_dict: dict, stn_times: np.ndarray, stn_counties: np.ndarray,
+                                 nc_times: pd.DatetimeIndex, nc_counties: np.ndarray, stn_file: Path):
     xx_county, xx_time = _match_subset_with_nc_dims(stn_times=stn_times, stn_counties=stn_counties,
                                                     nc_times=nc_times, nc_counties=nc_counties,
                                                     filename=stn_file)
+
+    shape = [nc_counties.size, nc_times.size]
+    wts = np.zeros(shape, dtype=np.float)
+    # numpy behaves strangely when given 1D logical arrays for each dimension. The ix_ function converts them to the
+    # proper 2D-ish (though still vector) integer arrays.
+    wts[np.ix_(xx_county, xx_time)] = 1.0
+
     for varkey, vararray in data_dict.items():
+        data = np.zeros(shape, dtype=np.float)
+        data[np.ix_(xx_county, xx_time)] = vararray
+        sums[varkey].update(data, wts)
+
+
+def _insert_data_in_nc_file(nh: ncdf.Dataset, sums: dict):
+
+    for varkey, varsum in sums.items():
         varname, _ = _variable_info[varkey]
-        nh.variables[varname][xx_county, xx_time] = vararray
+        vararray = varsum._sum.copy()
+        vararray[varsum._weights < 0.5] = ncdf.default_fillvals['f8']
+        nh.variables[varname][:] = varsum._sum
