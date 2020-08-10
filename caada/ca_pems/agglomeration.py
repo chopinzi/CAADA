@@ -69,8 +69,9 @@ def _agglomerate_district_to_counties(pems_district_root: _pathlike, meta_distri
     full_df = pd.concat(full_df, axis=0)
 
     print('Adding county IDs...', end=' ')
+    t = time.time()
     _add_county_ids(full_df, meta_district_root)
-    print('Done.')
+    print('Done (time required {:.1f} sec).'.format(time.time() - t))
 
     # Group by counties, compute both the total vehicles/day
     xx = full_df['county id'] >= 0
@@ -79,6 +80,8 @@ def _agglomerate_district_to_counties(pems_district_root: _pathlike, meta_distri
 
 
 def _add_county_ids(df: pd.DataFrame, metadata_dir: _pathlike):
+    meta_cls = metadata.PemsMeta(metadata_dir)
+
     df['county id'] = -99
     for sid, sid_df in df.groupby('station'):
         times = sid_df['timestamp'].unique()

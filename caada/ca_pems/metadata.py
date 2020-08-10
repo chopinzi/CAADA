@@ -10,6 +10,39 @@ from ..caada_typing import \
     pathlike as _pathlike
 
 
+class PemsMeta:
+    def __init__(self, meta_dir: _pathlike):
+        metadata_files = _get_avail_metadata(meta_dir)
+
+        indiv_dfs = []
+        for date, fpath in metadata_files.iteritems():
+            this_meta_df = readers.read_pems_station_meta(fpath)
+            index_df = pd.DataFrame({'date': date, 'station': this_meta_df.index})
+            this_meta_df.index = pd.MultiIndex.from_frame(index_df)
+            indiv_dfs.append(this_meta_df)
+
+        self.meta_df = pd.concat(indiv_dfs, axis=0)
+
+    def get_column_df(self, column, dtype=None, fill='DO NOT FILL'):
+        coerce_fill = fill != 'DO NOT FILL'
+        coerce_dtype = dtype is not None
+
+        df_dict = dict()
+        for date in self.meta_df.index.get_level_values(level=0).unique():
+            col_data = self.meta_df.xs(date, level=0, axis=0)[column]
+            df_dict[date] = col_data
+        df = pd.DataFrame(df_dict)
+
+        if coerce_dtype or coerce_fill:
+            for k, col_data in df.iteritems():
+                if fill != 'DO NOT FILL':
+                    col_data = col_data.fillna(fill)
+                if dtype is not None:
+                    col_data = col_data.astype(dtype)
+                df[k] = col_data
+        return df
+
+
 def _get_avail_metadata(metadata_dir: _pathlike) -> pd.Series:
     metadata_dir = Path(metadata_dir)
     metadata_files = [f for f in metadata_dir.iterdir() if f.is_file() and f.suffix == '.txt']
