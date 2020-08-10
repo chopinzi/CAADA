@@ -22,11 +22,14 @@ _state_gdf['statefp'] = _state_gdf['statefp'].astype('int')
 
 
 def _standardize_input_ids(county_ids, state_ids):
-    if isinstance(county_ids, (int, type(None))):
+    if county_ids is None and state_ids is None:
         county_ids = [county_ids]
-        if not isinstance(state_ids, int):
+        state_ids = [state_ids]
+    elif isinstance(county_ids, (int, type(None))):
+        county_ids = [county_ids]
+        if state_ids is not None and not isinstance(state_ids, int):
             county_ids *= len(state_ids)
-    if isinstance(state_ids, int):
+    if state_ids is None or isinstance(state_ids, int):
         state_ids = [state_ids] * len(county_ids)
     elif len(state_ids) != len(county_ids):
         raise ValueError('Either provide a single state ID for all counties (as an integer) or a sequence the same '
@@ -69,7 +72,10 @@ def get_poly_gdf_subset(county_ids: Optional[intseq], state_ids: Union[int, ints
     county_ids, state_ids = _standardize_input_ids(county_ids, state_ids)
     polys = []
     for cid, sid in zip(county_ids, state_ids):
-        xx = (_county_gdf['statefp'] == sid)
+        if sid is None:
+            xx = (_county_gdf['statefp'] > -99)
+        else:
+            xx = (_county_gdf['statefp'] == sid)
         if cid is not None:
             xx &= (_county_gdf['countyfp'] == cid)
 
