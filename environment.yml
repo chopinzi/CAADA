@@ -1,4 +1,4 @@
-name: covid-data
+name: caada
 channels:
   - conda-forge
   - defaults
@@ -18,5 +18,5 @@ dependencies:
   - fuzzywuzzy
   - beautifulsoup4
   - selenium
-prefix: /home/josh/anaconda3/envs/covid-data
+prefix: /home/josh/anaconda3/envs/caada
 

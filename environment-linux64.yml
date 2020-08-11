@@ -1,4 +1,4 @@
-name: covid-data
+name: caada
 channels:
   - conda-forge
   - defaults
@@ -163,5 +163,5 @@ dependencies:
   - zeromq=4.3.2=he1b5a44_2
   - zlib=1.2.11=h7b6447c_3
   - zstd=1.4.4=h6597ccf_3
-prefix: /home/josh/anaconda3/envs/covid-data
+prefix: /home/josh/anaconda3/envs/caada
 

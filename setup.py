@@ -7,5 +7,9 @@ setup(
     license='',
     author='Joshua Laughner',
     author_email='jllacct119@gmail.com',
+    install_requires=['geopandas',
+                      'netCDF4',
+                      'numpy',
+                      'pandas'],
     description='COVID Atmospheric Ancillary Data Agglomerator'
 )
