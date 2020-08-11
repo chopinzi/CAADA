@@ -1,0 +1,3 @@
+include caada/common_ancillary/county_shp_files/*
+include caada/common_ancillary/state_shp_files/*
+include caada/ca_pems/ancillary/*.txt

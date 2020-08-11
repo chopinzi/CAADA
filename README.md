@@ -64,3 +64,47 @@ Any `command text` is to be executed in the terminal.
    python setup.py install --user
    cd ..    
    ```
+
+## Using CAADA
+
+During the installation, a command line interface program named `caada-main` is
+created. If you install into a Conda environment (and do not have a `~/.pydistutils.cfg`
+file that alters install paths), that environment *must* be active for `caada-main` to
+be on your `PATH` (i.e. findable from the terminal). The various agglomerators are
+available as subcommands to this main program. You can see them with the `-h` or
+`--help` flags: 
+
+```
+$ caada-main --help
+usage: __main__.py [-h] {ca-pems} ...
+
+Agglomerate various datasets into netCDF files
+
+positional arguments:
+  {ca-pems}
+    ca-pems   Agglomerate Caltrans PEMS station data
+
+optional arguments:
+  -h, --help  show this help message and exit
+```
+
+To see the options for a specific subcommand, pass `-h` or `--help` after that
+subcommand:
+
+```
+$ caada-main ca-pems --help
+usage: __main__.py ca-pems [-h] [-s {county}] pems_root meta_root save_path
+
+Agglomerate Caltrans PEMS station files into a single netCDF file
+
+positional arguments:
+  pems_root             The path to the root directory containing the PEMS data. This must be a directory with subdirectories organizing the data by district named "d03", "d04", ..., "d12". DO NOT mix different
+                        time resolutions.
+  meta_root             The path to the root directory containing the PEMS metadata. This must have the same organization as PEMS_ROOT.
+  save_path             The path to save the netCDF file as (including filename).
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -s {county}, --spatial-resolution {county}
+                        What spatial resolution to agglomerate the data to.
+```

@@ -11,5 +11,9 @@ setup(
                       'netCDF4',
                       'numpy',
                       'pandas'],
+    include_package_data=True,
+    entry_points={
+            'console_scripts': ['caada-main=caada.__main__:main']
+        },
     description='COVID Atmospheric Ancillary Data Agglomerator'
 )

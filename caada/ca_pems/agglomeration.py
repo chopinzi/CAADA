@@ -22,6 +22,12 @@ from ..caada_typing import \
 # TODO: deal with missing days/days with below the min_percent_observed. Need to normalize the data in some way so that
 #  counties that happened to have more days/stations that fell below this threshold aren't undercounted.
 # TODO: make this its own repo and record commit info in the netCDF file. I wrote a VCS module somewhere, use that.
+def cl_dispatcher(spatial_resolution='county', **kwargs):
+    if spatial_resolution == 'county':
+        return agglomerate_by_country(**kwargs)
+    else:
+        raise ValueError('Unknown spatial resolution "{}"'.format(spatial_resolution))
+
 
 def agglomerate_by_country(pems_root: _pathlike, meta_root: _pathlike, save_path: _pathlike,
                            min_percent_observed: _scalarnum = 75, variables: _strseq = ('samples', 'total flow')):
@@ -143,4 +149,4 @@ def _save_county_file(data_dict: dict, dates: np.ndarray, county_ids: np.ndarray
         ds.setncattr('variable_attr_help', "The `pems_description` attribute contains the description of that variable's"
                                            "raw form in the Caltrans PEMS online database. The `description` attribute "
                                            "describes the calculations done to aggregate it for this file.")
-        common_utils.add_caad_info(ds)
+        common_utils.add_caada_info(ds)
