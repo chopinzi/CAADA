@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 from .agglomeration import cl_dispatcher
+from .files import sort_pems_files
 
 
 def parse_ca_pems_agg_args(p: ArgumentParser):
@@ -14,3 +15,16 @@ def parse_ca_pems_agg_args(p: ArgumentParser):
     p.add_argument('-s', '--spatial-resolution', default='county', choices=('county',),
                    help='What spatial resolution to agglomerate the data to.')
     p.set_defaults(driver_fxn=cl_dispatcher)
+
+
+def parse_ca_pems_orgfiles_args(p: ArgumentParser):
+    p.description = 'Organize downloaded Caltrans PEMS stations files into directories needed by the agglomerator'
+    p.add_argument('pems_root', help='The path to the directory where you want the actual data stored.')
+    p.add_argument('meta_root', help='The path to the directory where you want the metadata stored.')
+    p.add_argument('pems_files', nargs='+', help='All PEMS station and station metadata files to organize.')
+    p.add_argument('-x', '--delete-orig', action='store_true', help='Delete original files as they are moved.')
+    p.add_argument('-c', '--no-decompress', action='store_false', dest='decompress',
+                   help='Do not decompress any .gz files as they are moved. By default, .gz files are decompressed '
+                        'and, if --delete-orig is specified, deleted.')
+    p.add_argument('-d', '--dry-run', action='store_true', help='Print what would be done, but do not actually do it.')
+    p.set_defaults(driver_fxn=sort_pems_files)
