@@ -84,11 +84,14 @@ def get_poly_gdf_subset(county_ids: Optional[intseq], state_ids: Union[int, ints
 
 
 def get_state_polygons(state_ids, as_gdf=False):
-    if isinstance(state_ids, int):
+    if isinstance(state_ids, int) or state_ids is None:
         state_ids = [state_ids]
 
     polys = []
     for sid in state_ids:
+        if sid is None:
+            continue
+
         xx = _state_gdf['statefp'] == sid
         if xx.sum() != 1:
             raise IndexError('Expected 1 match for state ID = {}, instead got {}'.format(sid, xx.sum()))
@@ -96,10 +99,14 @@ def get_state_polygons(state_ids, as_gdf=False):
             polys.append(_state_gdf.index[xx].item())
         else:
             polys.append(_state_gdf.loc[xx, 'geometry'].item())
-    if as_gdf:
+    if as_gdf and len(polys) > 0:
         return _state_gdf.loc[polys, :]
-    else:
+    elif as_gdf:
+        return _state_gdf
+    elif len(polys) > 0:
         return polys
+    else:
+        return _state_gdf['geometry'].tolist()
 
 
 def geometry_to_lat_lon(geo):
