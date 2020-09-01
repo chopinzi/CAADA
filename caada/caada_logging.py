@@ -5,6 +5,7 @@ formatter = logging.Formatter('[%(levelname)s - %(module)s] %(message)s')
 stream = logging.StreamHandler()
 stream.setFormatter(formatter)
 logger.addHandler(stream)
+logger.setLevel(logging.DEBUG)  # default to highest logging
 
 
 def set_log_level(level):
