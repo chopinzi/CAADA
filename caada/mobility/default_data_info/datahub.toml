@@ -1,0 +1,190 @@
+# netCDF attributes for the COVID-19 datahub .csv
+# descriptions are copied from https://covid19datahub.io/articles/doc/data.html
+# each variable is a table, with each attribute as entries.
+# some attributes receive special handling if present:
+#   dtype - a string that netCDF4 can interpret as a datatype. "str" will be taken to mean a variable length string.
+#   enum - must be a table with integer keys and string values. The string values will be stored in a separate variable
+#    ($name_categories) or as an enum type, depending on the command line choice. Variables with this as an attribute
+#    automatically get a dtype of uint8 and a unit of "categorical" unless overridden.
+#   missing - the fill value to use as fill value. If not specified, default values of NaN for floats and the max
+#    allowed value for integer types.
+[id]
+dtype = "S8"
+description = "Unique identifier for a administrative area"
+
+[deaths]
+dtype = "int"
+description = "Cumulative number of confirmed deaths"
+unit = "cumulative count"
+
+[confirmed]
+dtype = "int"
+description = "Cumulative number of confirmed cases"
+unit = "cumulative count"
+
+[tests]
+dtype = "int"
+description = "Cumulative number of test"
+unit = "cumulative count"
+
+[recovered]
+dtype = "int"
+description = "Cumulative number of patients released from hospital or confirmed recovered"
+unit = "cumulative count"
+
+[hosp]
+dtype = "int"
+description = "Number on hospitalized patients on a given date"
+unit = "count"
+
+[icu]
+dtype = "int"
+description = "Number of hospitalized patients in ICUs on a given date"
+unit = "count"
+
+[vent]
+dtype = "int"
+description = "Number of patients requiring invasive ventilation on a given date"
+unit = "count"
+
+[population]
+dtype = "int"
+description = "Total population in this administrative area"
+unit = "count"
+
+[school_closing]
+description = "Categorization of intensity of closing order for schools"
+[school_closing.enum]
+    0 = "No measures"
+    1 = "Recommended closing"
+    2 = "Require closing, some levels or categories"
+    3 = "Require closing, all levels or categories"
+
+[workplace_closing]
+description = "Categorization of intensity of closing order for workplaces"
+[workplace_closing.enum]
+    0 = "No measures"
+    1 = "Recommend closing (or work from home)"
+    2 = "Require closing for some sectors or categories of workers"
+    3 = "require closing (or work from home) all-but-essential workplaces (eg grocery stores, doctors)"
+
+[cancel_events]
+description = "Categorization of intensity of order to cancel events"
+[cancel_events.enum]
+    0 = "No measures"
+    1 = "Recommend cancelling"
+    2 = "Require cancelling"
+
+[gatherings_restrictions]
+description = "Categorization of intensity of order to limit gatherings"
+[gatherings_restrictions.enum]
+    0 = "No restrictions"
+    1 = "Restrictions on very large gatherings (the limit is above 1000 people)"
+    2 = "Restrictions on gatherings between 100-1000 people"
+    3 = "Restrictions on gatherings between 10-100 people"
+    4 = "Restrictions on gatherings of less than 10 people"
+
+[transport_closing]
+description = "Categorization of intensity of order to close or limit transportation"
+[transport_closing.enum]
+    0 = "No measures"
+    1 = "Recommend closing (or significantly reduce volume/route/means of transport available)"
+    2 = "Require closing (or prohibit most citizens from using it)"
+
+[stay_home_restrictions]
+description = "Categorization of intensity of order limiting how much residence can leave their homes"
+[stay_home_restrictions.enum]
+    0 = "No measures"
+    1 = "Recommend not leaving house"
+    2 = "Require not leaving house with exceptions for daily exercise, grocery shopping, and 'essential' trips"
+    3 = "Require not leaving house with minimal exceptions (e.g. allowed to leave only once every few days, or only one person can leave at a time, etc.)"
+
+[internal_movement_restrictions]
+description = "Categorization of order restricting movement within an area"
+[internal_movement_restrictions.enum]
+    0 = "No measures"
+    1 = "Recommend closing (or significantly reduce volume/route/means of transport)"
+    2 = "Require closing (or prohibit most people from using it)"
+
+[international_movement_restrictions]
+description = "Categorization of orders restricting movement across international borders"
+[international_movement_restrictions.enum]
+    0 = "No measures"
+    1 = "Screening"
+    2 = "Quarantine arrivals from high-risk regions"
+    3 = "Ban on high-risk regions"
+    4 = "Total border closure"
+
+[information_campaigns]
+description = "Categorization of presence of public information campaigns"
+[information_campaigns.enum]
+    0 = "No COVID-19 public information campaign"
+    1 = "Public officials urging caution about COVID-19"
+    2 = "Coordinated public information campaign (e.g. across traditional and social media)"
+
+[testing_policy]
+description = "Categorization of COVID-19 testing policy"
+[testing_policy.enum]
+    0 = "No testing policy"
+    1 = "Only those who both (a) have symptoms AND (b) meet specific criteria (eg key workers, admitted to hospital, came into contact with a known case, returned from overseas)"
+    2 = "Testing of anyone showing COVID-19 symptoms"
+    3 = "Open public testing (eg “drive through” testing available to asymptomatic people)"
+
+[contact_tracing]
+description = "Categorization of intensity of contact tracing carried out"
+[contact_tracing.enum]
+    0 = "No contact tracing"
+    1 = "Limited contact tracing, not done for all cases"
+    2 = "Comprehensive contact tracing, done for all cases"
+
+[stringency_index]
+dtype = "float"
+description = "An index summarizing the overall stringency (intensity) of measures taken to limit the spread of COVID-19 in this area"
+see_also = "https://www.bsg.ox.ac.uk/sites/default/files/2020-04/BSG-WP-2020-032-v5.0.pdf"
+unit = "percent"
+vmin = 0.0
+vmax = 100.0
+
+[latitude]
+dtype = "float"
+units = "degrees_north"
+
+[longitude]
+dtype = "float"
+units = "degrees_east"
+
+[administrative_area_level]
+dtype = "int"
+description = "What level (i.e. how large/inclusive) an administrative area this entry refers to"
+
+[administrative_area_level_1]
+dtype = "str"
+description = "Name of Level 1 administrative area containing this entry (usually nation)"
+
+[administrative_area_level_2]
+dtype = "str"
+description = "Name of Level 2 administrative area containing this entry (usually state/province/canton/region/etc.)"
+
+[administrative_area_level_3]
+dtype = "str"
+description = "Name of Level 3 administrative area containing this entry (usually cities/municipalities)"
+
+[key]
+dtype = "str"
+description = "Identifier used in governmental data"
+
+[key_alpha_2]
+dtype = "S2"
+description = "Two-letter code used in governmental data"
+
+[key_numeric]
+dtype = "int"
+description = "Numeric code used in governmental data"
+
+[key_google_mobility]
+dtype = "str"
+description = "Identifier used in Google Mobility Reports (https://www.google.com/covid19/mobility/)"
+
+[key_apple_mobility]
+dtype = "str"
+description = "Identifier used in Apple Mobility Reports (https://www.apple.com/covid19/mobility)"
