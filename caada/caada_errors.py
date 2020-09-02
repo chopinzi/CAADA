@@ -3,6 +3,11 @@ class DimensionError(Exception):
     pass
 
 
+class ParsingError(Exception):
+    """Base error type for errors relating to parsing"""
+    pass
+
+
 class HTMLError(Exception):
     """Base error type for errors relating to HTML"""
     pass
@@ -13,6 +18,11 @@ class HTMLRequestError(HTMLError):
     pass
 
 
-class HTMLParsingError(HTMLError):
+class HTMLParsingError(HTMLError, ParsingError):
     """Base error type for errors parsing HTML"""
+    pass
+
+
+class ExcelParsingError(ParsingError):
+    """Error type for errors parsing Excel sheets"""
     pass

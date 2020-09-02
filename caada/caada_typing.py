@@ -5,6 +5,7 @@ from typing import Sequence, Union
 
 datetimelike = Union[datetime, Timestamp]
 pathlike = Union[str, Path]
+stringlike = Union[str, bytes]
 scalarnum = Union[int, float]
 intseq = Sequence[int]
 floatseq = Sequence[float]

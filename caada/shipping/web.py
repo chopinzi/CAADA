@@ -1,12 +1,19 @@
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, element as bs4_element
 import numpy as np
 import pandas as pd
 import re
-import urllib3
+import requests
 
 from typing import Optional
 
+from .readers import parse_oakland_excel
+
+from ..caada_typing import stringlike
 from ..caada_errors import HTMLParsingError, HTMLRequestError
+
+##############
+# PORT OF LA #
+##############
 
 
 def _convert_la_numbers(val):
@@ -17,6 +24,15 @@ def _convert_la_numbers(val):
         # This will handle empty cells (e.g. that haven't been filled yet) and misformatted cells (e.g. one number was
         # "2,406.662.05" - two decimal points)
         return np.nan
+
+
+def get_all_la_port_container_data(index: str = 'datetime') -> pd.DataFrame:
+    this_year = pd.Timestamp.now().year
+    dfs = []
+    for yr in range(1995, this_year+1):
+        dfs.append( get_la_port_container_data(yr, index=index) )
+
+    return pd.concat(dfs, axis=0)
 
 
 def get_la_port_container_data(year: int, index: str = 'datetime') -> pd.DataFrame:
@@ -46,19 +62,18 @@ def get_la_port_container_data(year: int, index: str = 'datetime') -> pd.DataFra
     else:
         raise ValueError('"{}" is not one of the allowed values for index'.format(index))
 
-    http = urllib3.PoolManager()
-    r = http.request('GET', 'https://www.portoflosangeles.org/business/statistics/container-statistics/historical-teu-statistics-{:04d}'.format(year))
-    if r.status == 200:
-        return parse_la_port_html(r.data, parse_year)
-    elif r.status == 404:
+    r = requests.get('https://www.portoflosangeles.org/business/statistics/container-statistics/historical-teu-statistics-{:04d}'.format(year))
+    if r.status_code == 200:
+        return parse_la_port_html(r.content, parse_year)
+    elif r.status_code == 404:
         # Page not found, usually because you asked for a year that isn't online
         raise HTMLRequestError('Failed to retrieve the Port of LA page for {}. Their server may be down, or the '
                                'year you requested may be out of range. Years before 1995 are not available.'.format(year))
     else:
-        raise HTMLRequestError('Failed to retrieve the Port of LA page for {}. HTML response code was {}'.format(year, r.status))
+        raise HTMLRequestError('Failed to retrieve the Port of LA page for {}. HTML response code was {}'.format(year, r.status_code))
 
 
-def parse_la_port_html(html: str, year: Optional[int] = None):
+def parse_la_port_html(html: stringlike, year: Optional[int] = None) -> pd.DataFrame:
     """Parse LA port container data from HTML into a dataframe.
 
     Parameters
@@ -113,3 +128,112 @@ def parse_la_port_html(html: str, year: Optional[int] = None):
         df.index = date_index
 
     return df
+
+
+###################
+# PORT OF OAKLAND #
+###################
+
+def get_oakland_container_data(url: str = 'https://www.oaklandseaport.com/performance/facts-figures/') -> pd.DataFrame:
+    """Download the full record of Oakland container data
+
+    Parameters
+    ----------
+    url
+        The URL to retrieve from. Usually does not need to change.
+
+    Returns
+    -------
+    pandas.DataFrame
+        A dataframe containing the historical data (extracted from their Excel sheet) and this years data (extracted
+        directly from the web page).
+
+    Notes
+    -----
+    This will actually fetch the data from the Port of Oakland webpage. It is best to fetch this data once and reuse
+    the returned dataframe, rather than requesting it repeatedly.
+    """
+    r = requests.get(url)
+    if r.status_code != 200:
+        raise HTMLRequestError('Failed to retrieve Oakland container web page (URL = {})'.format(url))
+    soup = BeautifulSoup(r.content)
+
+    # First try to find the link to the Excel sheet and download it
+    xlsx_url = None
+    for el in soup('a'):
+        if 'href' in el.attrs and 'xlsx' in el.attrs['href']:
+            if xlsx_url is None:
+                xlsx_url = el.attrs['href']
+            else:
+                raise HTMLParsingError('Multiple links to Excel files found on Oakland container page')
+
+    if xlsx_url is None:
+        raise HTMLParsingError('No links to Excel files found on Oakland container page')
+
+    # The link in the page usually doesn't include the HTTP/HTTPS, so prepend it if needed
+    if not xlsx_url.startswith('http'):
+        schema = url.split('//')[0]
+        xlsx_url = '{}{}'.format(schema, xlsx_url)
+    r_wb = requests.get(xlsx_url)
+    if r_wb.status_code != 200:
+        raise HTMLRequestError('Failed to retrieve Oakland container xlsx file (URL = {})'.format(xlsx_url))
+
+    # Parse the Excel file contents first, then append the most recent data from the web page
+    df = parse_oakland_excel(r_wb.content, is_contents=True)
+    df_recent = _parse_oakland_page(r.content)
+
+    return pd.concat([df, df_recent], axis=0)
+
+
+def _parse_oakland_page(content: bytes):
+    """Parse the Oakland facts & figures page to extract a dataframe of container moves"""
+    soup = BeautifulSoup(content)
+
+    # Try to find the year in the page headings. Usually the first <h2> element
+    # is something like: <h2 style="text-align: center;">2020 Container Activity (TEUs)</h2>
+    year = None
+    for heading in soup.find_all('h2'):
+        m = re.search(r'\d{4}', heading.text)
+        if m:
+            year = int(m.group())
+            break
+    if year is None:
+        raise HTMLParsingError('Could not identify year in Oakland port data page')
+
+    charts = soup.find_all('div', attrs={'class': 'chart-wrapper'})
+    chart_data = dict()
+
+    # The last chart is a summary of past years' total TEUs so we skip it
+    for c in charts[:-1]:
+        category, months, teus = _parse_one_oakland_chart(c)
+        dtind = pd.DatetimeIndex([pd.Timestamp(year, m, 1) for m in months])
+        chart_data[category] = pd.Series(teus, index=dtind)
+
+    # Compute the total for convenience and make sure the totals are in order
+    df = pd.DataFrame(chart_data)
+    col_order = df.columns.tolist()
+    df['Full Total'] = df['Full Imports'] + df['Full Exports']
+    df['Empty Total'] = df['Empty Imports'] + df['Empty Exports']
+    df['Grand Total'] = df['Full Total'] + df['Empty Total']
+    col_order.insert(2, 'Full Total')
+    col_order.append('Empty Total')
+    col_order.append('Grand Total')
+    return df[col_order]
+
+
+def _parse_one_oakland_chart(chart: bs4_element):
+    """Parse one of the charts on the Oakland page"""
+    title_el = chart.find('div', attrs={'class': 'chart-vertical-title'})
+    title = title_el.text
+
+    data_els = [el for el in chart.find_all('li') if 'title' in el.attrs]
+    months = []
+    teus = []
+    for el in data_els:
+        month = pd.to_datetime(el.attrs['title'], format='%b').month
+        num_el = el.find('span', attrs={'class': 'number'})
+        num = np.nan if len(num_el.text) == 0 else np.float(num_el.text.replace(',', ''))
+        months.append(month)
+        teus.append(num)
+
+    return title, months, teus
