@@ -86,7 +86,7 @@ def _parse_oakland_sheet(sheet: xlrd.sheet.Sheet, datemode: int):
     date_col = sheet.col(0)
     dates = []
     keys = ['Full Imports', 'Full Exports', 'Full Total', 'Empty Imports', 'Empty Exports', 'Empty Total',
-            'Grand Total']
+            'Total TEUs']
     data = {k: [] for k in keys}
     for irow, cell in enumerate(date_col[6:], start=6):
         if isinstance(cell.value, str) and len(cell.value) == 0:
@@ -108,4 +108,4 @@ def _parse_oakland_sheet(sheet: xlrd.sheet.Sheet, datemode: int):
                 data[k].append(val)
 
     dates = pd.DatetimeIndex(dates)
-    return pd.DataFrame(data, index=dates)
+    return pd.DataFrame(data, index=dates).drop(columns=['Full Total', 'Empty Total'])

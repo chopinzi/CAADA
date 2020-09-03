@@ -10,6 +10,7 @@ from .readers import parse_oakland_excel
 
 from ..caada_typing import stringlike
 from ..caada_errors import HTMLParsingError, HTMLRequestError
+from ..caada_logging import logger
 
 ##############
 # PORT OF LA #
@@ -103,8 +104,7 @@ def parse_la_port_html(html: stringlike, year: Optional[int] = None) -> pd.DataF
     # Get the rows of the table - the first will give us the header, the rest will give
     # us the data. Read it into a dict that can be easily converted to a dataframe
     tr_tags = table('tr')
-    header = [tag.text.strip() for tag in tr_tags[0]('td')]
-    header[-1] = '{} (%)'.format(header[-1])
+    header = [_stdize_la_table_header(tag.text) for tag in tr_tags[0]('td')]
     index = []
     df_dict = {k: [] for k in header[1:]}
     for row in tr_tags[1:]:
@@ -127,7 +127,61 @@ def parse_la_port_html(html: stringlike, year: Optional[int] = None) -> pd.DataF
         df = df.iloc[:12, :]
         df.index = date_index
 
+    _check_la_sums(df, year)
+
     return df
+
+
+def _stdize_la_table_header(column_header: str):
+    parts = column_header.strip().split()
+    if len(parts) == 0:
+        return ''
+    elif len(parts) == 2:
+        if re.search(r'load', parts[0], re.IGNORECASE):
+            parts[0] = 'Full'
+        elif re.search(r'empty', parts[0], re.IGNORECASE):
+            parts[0] = 'Empty'
+        elif re.search(r'total', parts[0], re.IGNORECASE):
+            parts[0] = 'Total'
+        else:
+            raise HTMLParsingError('Unknown LA container table header: {}'.format(parts[0]))
+
+        if re.search(r'import', parts[1], re.IGNORECASE):
+            parts[1] = 'Imports'
+        elif re.search(r'export', parts[1], re.IGNORECASE):
+            parts[1] = 'Exports'
+        elif re.search(r'teu', parts[1], re.IGNORECASE):
+            parts[1] = 'TEUs'
+        else:
+            raise HTMLParsingError('Unknown LA container table header: {}'.format(parts[0]))
+
+        return ' '.join(parts)
+    elif len(parts) == 3 and re.search(r'change', column_header, re.IGNORECASE):
+        return 'Prior Year Change (%)'
+    else:
+        raise HTMLParsingError('Unexpected LA container table header: {}'.format(column_header))
+
+
+def _check_la_sums(la_df: pd.DataFrame, year):
+    def check(total_col, col1, col2):
+        return (la_df[total_col] - (la_df[col1] + la_df[col2])).abs().max() <= 1
+    # The 1995 LA container table erroneously put "Total TEUs" in the header but then meant "Total Exports". So check
+    # their sums for parity, and fix that year
+    if year == 1995:
+        logger.warning('1995 LA container table has known issue of mislabeled Total Exports and Total TEUs - fixing')
+        _fix_la_1995(la_df)
+
+    if not check('Total Imports', 'Full Imports', 'Empty Imports'):
+        logger.warning('%d LA container table - total imports do not match sum of full and empty imports', year)
+    if not check('Total Exports', 'Full Exports', 'Empty Exports'):
+        logger.warning('%d LA container table - total exports do not match sum of full and empty exports', year)
+    if not check('Total TEUs', 'Total Imports', 'Total Exports'):
+        logger.warning('%d LA container table - total TEUs do not match sum of imports and exports', year)
+
+
+def _fix_la_1995(la_df: pd.DataFrame):
+    la_df.rename(columns={'Total TEUs': 'Total Exports'}, inplace=True)
+    la_df['Total TEUs'] = la_df['Total Exports'] + la_df['Total Imports']
 
 
 ###################
@@ -156,7 +210,7 @@ def get_oakland_container_data(url: str = 'https://www.oaklandseaport.com/perfor
     r = requests.get(url)
     if r.status_code != 200:
         raise HTMLRequestError('Failed to retrieve Oakland container web page (URL = {})'.format(url))
-    soup = BeautifulSoup(r.content)
+    soup = BeautifulSoup(r.content, features='html.parser')
 
     # First try to find the link to the Excel sheet and download it
     xlsx_url = None
@@ -182,12 +236,16 @@ def get_oakland_container_data(url: str = 'https://www.oaklandseaport.com/perfor
     df = parse_oakland_excel(r_wb.content, is_contents=True)
     df_recent = _parse_oakland_page(r.content)
 
-    return pd.concat([df, df_recent], axis=0)
+    df = pd.concat([df, df_recent], axis=0)
+    df['Total Imports'] = df['Full Imports'] + df['Empty Imports']
+    df['Total Exports'] = df['Full Exports'] + df['Empty Exports']
+    df['Total TEUs'] = df['Total Exports'] + df['Total Imports']
+    return df
 
 
 def _parse_oakland_page(content: bytes):
     """Parse the Oakland facts & figures page to extract a dataframe of container moves"""
-    soup = BeautifulSoup(content)
+    soup = BeautifulSoup(content, features='html.parser')
 
     # Try to find the year in the page headings. Usually the first <h2> element
     # is something like: <h2 style="text-align: center;">2020 Container Activity (TEUs)</h2>
@@ -210,15 +268,15 @@ def _parse_oakland_page(content: bytes):
         chart_data[category] = pd.Series(teus, index=dtind)
 
     # Compute the total for convenience and make sure the totals are in order
-    df = pd.DataFrame(chart_data)
-    col_order = df.columns.tolist()
-    df['Full Total'] = df['Full Imports'] + df['Full Exports']
-    df['Empty Total'] = df['Empty Imports'] + df['Empty Exports']
-    df['Grand Total'] = df['Full Total'] + df['Empty Total']
-    col_order.insert(2, 'Full Total')
-    col_order.append('Empty Total')
-    col_order.append('Grand Total')
-    return df[col_order]
+    return pd.DataFrame(chart_data)
+    # col_order = df.columns.tolist()
+    # df['Total Imports'] = df['Full Imports'] + df['Empty Imports']
+    # df['Total Exports'] = df['Full Exports'] + df['Empty Exports']
+    # df['Total TEUs'] = df['Total Imports'] + df['Total Exports']
+    # col_order.append('Total Imports')
+    # col_order.append('Total Exports')
+    # col_order.append('Total TEUs')
+    # return df[col_order]
 
 
 def _parse_one_oakland_chart(chart: bs4_element):
