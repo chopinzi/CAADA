@@ -1,0 +1,31 @@
+[opensky-covid]
+[opensky-covid.airport]
+description = "IACO code for the airport"
+
+[opensky-covid.arrivals]
+units = "#"
+description = "Number of flights inferred to have each airport as a destination given their flight path when last seen"
+
+[opensky-covid.departures]
+units = "#"
+description = "Number of flights inferred to have each airport as an origin given their flight path when last seen"
+
+[opensky-covid.iata_code]
+description = "IATA airport code"
+
+[opensky-covid.airport_name]
+description = "Formal name of the airport"
+
+[opensky-covid.airport_city]
+description = "City where the airport is located"
+
+[opensky-covid.airport_country]
+description = "Country where the airport is located"
+
+[opensky-covid.airport_longitude]
+units = "degrees_east"
+description = "Longitude of the airport"
+
+[opensky-covid.airport_latitude]
+units = "degrees_north"
+description = "Latitude of the airport"

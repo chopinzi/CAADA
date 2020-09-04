@@ -1,7 +1,7 @@
 import logging
 
 logger = logging.getLogger('CAADA')
-formatter = logging.Formatter('[%(levelname)s - %(module)s] %(message)s')
+formatter = logging.Formatter('[%(levelname)s: %(module)s] %(message)s')
 stream = logging.StreamHandler()
 stream.setFormatter(formatter)
 logger.addHandler(stream)

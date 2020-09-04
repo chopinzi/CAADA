@@ -1,6 +1,6 @@
 from pathlib import Path
-
-_cache_dir = Path(__file__).parent / 'cache'
+_my_dir = Path(__file__).parent
+_cache_dir = _my_dir / 'cache'
 if not _cache_dir.exists():
     _cache_dir.mkdir()
 
