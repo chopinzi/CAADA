@@ -104,6 +104,26 @@ def _summarize_opensky_to_array(df, groups, all_codes, date_fxn):
     return origin_counts_arr, dest_counts_arr, all_codes, unique_times
 
 
+def _summarize_opensky_to_df(df, groups, all_codes, date_fxn):
+    # Note: not tested. Likely needs reworked.
+    mi_tuples = []
+    data = dict(origin_count=[], dest_count=[], latitude=[], longitude=[])
+
+    n = groups.unique().size * len(all_codes)
+    print(n)
+    pbar = miscutils.ProgressBar(n, prefix='Summarizing', style='bar+percent')
+    for _, date_df in df.groupby(groups):
+        this_date = date_fxn(date_df['day'].iloc[0])
+        for code in all_codes:
+            pbar.print_bar()
+            mi_tuples.append((this_date, code))
+            this_dict = get_info(date_df, code)
+            for k, v in this_dict.items():
+                data[k].append(v)
+
+    return pd.DataFrame(data, index=pd.MultiIndex.from_tuples(mi_tuples))
+
+
 def get_info(df, code):
     def get_info_helper(od):
         key = 'destination' if od == 'dest' else od
