@@ -18,7 +18,10 @@ from ..caada_logging import logger
 
 
 def _convert_la_numbers(val):
-    val = re.sub(r'[,%]', '', val.strip())
+    # If there happens to be a ',' two characters from the end, it should probably be a decimal point.
+    val = re.sub(r',\d\d$', '.', val.strip())
+    # Then just remove the remaining commas plus any percent signs
+    val = re.sub(r'[,%]', '', val)
     try:
         return float(val)
     except ValueError:
