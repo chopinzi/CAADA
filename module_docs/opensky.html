@@ -1,0 +1,341 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>OpenSky package API &mdash; COVID Atmospheric Ancillary Data Agglomerator (CAADA)  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Shipping package API" href="shipping.html" />
+    <link rel="prev" title="EIA package API" href="eia.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> COVID Atmospheric Ancillary Data Agglomerator (CAADA)
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ca_pems.html">CA PEMS package API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eia.html">EIA package API</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">OpenSky package API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-caada.opensky.agglomeration">Module: agglomeration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-caada.opensky.readers">Module: readers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="shipping.html">Shipping package API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streetlight.html">Streetlight package API</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">COVID Atmospheric Ancillary Data Agglomerator (CAADA)</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>OpenSky package API</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/module_docs/opensky.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="opensky-package-api">
+<h1>OpenSky package API<a class="headerlink" href="#opensky-package-api" title="Permalink to this headline">¶</a></h1>
+<p>This package handles loading and agglomerating <a class="reference external" href="https://opensky-network.org/">OpenSky</a> flight data. OpenSky already
+has <a class="reference external" href="https://github.com/xoolive/traffic">a useful Python interface</a> so this package is focused first on providing
+tools to read in the data made available by Strohmeier et al. in their <a class="reference external" href="https://essd.copernicus.org/preprints/essd-2020-223/">2020 ESSD paper</a>.</p>
+<div class="section" id="module-caada.opensky.agglomeration">
+<span id="module-agglomeration"></span><h2>Module: agglomeration<a class="headerlink" href="#module-caada.opensky.agglomeration" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="caada.opensky.agglomeration.summarize_and_merge_covid_files">
+<code class="sig-prename descclassname">caada.opensky.agglomeration.</code><code class="sig-name descname">summarize_and_merge_covid_files</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filenames</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">savename</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#caada.opensky.agglomeration.summarize_and_merge_covid_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Summarize Strohmeier et al. COVID-19 OpenSky files into a single netCDF file</p>
+<p>This will take a list of .csv files from <a class="reference external" href="https://essd.copernicus.org/preprints/essd-2020-223/">Strohmeier et al.</a>
+and summarize them into a single netCDF file with the number of arrivals and departures from each airport for each
+day, further broken down into international, domestic, and all flights. Additional metadata about the airports
+is retrieved from <a class="reference external" href="https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat">Openflights</a>
+and saved in the netCDF file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filenames</strong> – The list of .csv files to summarize</p></li>
+<li><p><strong>savename</strong> – The name to give the resulting netCDF file. Will be overwritten if already exists!</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Airport information from <a class="reference external" href="https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat">Openflights</a>
+is used to determine whether a flight is domestic or international. If an airport code is not included in the
+Openflights database, then flights to/from it cannot be properly categorized.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="caada.opensky.agglomeration.summarize_opensky_covid_file">
+<code class="sig-prename descclassname">caada.opensky.agglomeration.</code><code class="sig-name descname">summarize_opensky_covid_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">avg_to</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">output</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'array'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#caada.opensky.agglomeration.summarize_opensky_covid_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the summary of a single Strohmeier et al. .csv file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> – Path to the .csv file to summarize</p></li>
+<li><p><strong>avg_to</strong> – One of the strings “day” or “month”, controls whether the summary returned sums up data over individual days
+or months.</p></li>
+<li><p><strong>output</strong> – Controls what is returned. Currently “array” is the only valid value here.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>dict</em> – A dict of dicts, the first level will have keys “departures” and “arrivals” and the second level will have
+keys “all”, “domestic”, and “international”. The values of the second levels are arrays whose first dimensions
+are time and whose second dimensions are airport. These are the number of arrivals or departures for each
+airport in the time frame requested.</p></li>
+<li><p><em>strseq</em> – The list of ICAO airport codes that correspond to the second dimension of the arrays.</p></li>
+<li><p><em>Sequence[pandas.Timestamp]</em> – The list of dates that correspond to the first dimension of the arrays. If “month” was given as the value for
+<cite>avg_to</cite>, then these will be the first date of each month.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-caada.opensky.readers">
+<span id="module-readers"></span><h2>Module: readers<a class="headerlink" href="#module-caada.opensky.readers" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="caada.opensky.readers.read_airport_codes">
+<code class="sig-prename descclassname">caada.opensky.readers.</code><code class="sig-name descname">read_airport_codes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">source</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'openflights'</span></em>, <em class="sig-param"><span class="n">update</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'never'</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="headerlink" href="#caada.opensky.readers.read_airport_codes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read airport codes and geographic data from a web source</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> – Which web source to pull data from. Currently the only allowed option is <cite>“openflights”</cite>.</p></li>
+<li><p><strong>update</strong> – <p>Controls whether CAADA redownloads the needed data or not. Possible values are:</p>
+<blockquote>
+<div><ul>
+<li><p><cite>”never”</cite> - only download if no local copy is available.</p></li>
+<li><p><cite>”periodically”</cite> - only download if the local copy is more than a week old.</p></li>
+<li><p><cite>”always”</cite> - always redownloads</p></li>
+</ul>
+</div></blockquote>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dataframe containing geographic data about global airports. The exact data available depends on the source.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This data is automatically added to dataframes returned by <a class="reference internal" href="#caada.opensky.readers.read_opensky_covid_file" title="caada.opensky.readers.read_opensky_covid_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_opensky_covid_file()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="caada.opensky.readers.read_opensky_covid_file">
+<code class="sig-prename descclassname">caada.opensky.readers.</code><code class="sig-name descname">read_opensky_covid_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">code_source</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'openflights'</span></em>, <em class="sig-param"><span class="n">update_codes</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'never'</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="headerlink" href="#caada.opensky.readers.read_opensky_covid_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a .csv file prepared by Strohmeier et al. 2020 (ESSDD).</p>
+<p><a class="reference external" href="https://essd.copernicus.org/preprints/essd-2020-223/">Strohmeier et al.</a> prepared .csv file of OpenSky flight data
+during 2019 and 2020 to support COVID-19 research. This function will read one of those .csv files into a dataframe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> – Path to the .csv file to read</p></li>
+<li><p><strong>code_source</strong> – Which web source to use for the geographic data. See <a class="reference internal" href="#caada.opensky.readers.read_airport_codes" title="caada.opensky.readers.read_airport_codes"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_airport_codes()</span></code></a> in this module.</p></li>
+<li><p><strong>update_codes</strong> – Controls whether the geographic data is updated. See <a class="reference internal" href="#caada.opensky.readers.read_airport_codes" title="caada.opensky.readers.read_airport_codes"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_airport_codes()</span></code></a> in this module.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dataframe with the information from the .csv file. It will be joined with geographic data: columns prepended
+with “origin_” and “dest_” are the geographic data for the origin and destination airports, respectively.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="shipping.html" class="btn btn-neutral float-right" title="Shipping package API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="eia.html" class="btn btn-neutral float-left" title="EIA package API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Joshua Laughner
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

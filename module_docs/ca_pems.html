@@ -1,0 +1,445 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>CA PEMS package API &mdash; COVID Atmospheric Ancillary Data Agglomerator (CAADA)  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="EIA package API" href="eia.html" />
+    <link rel="prev" title="Welcome to CAADA’s documentation!" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> COVID Atmospheric Ancillary Data Agglomerator (CAADA)
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">CA PEMS package API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-caada.ca_pems.agglomeration">Module: agglomeration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-caada.ca_pems.exceptions">Module: exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-caada.ca_pems.files">Module: files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-caada.ca_pems.metadata">Module: metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-caada.ca_pems.readers">Module: readers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eia.html">EIA package API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opensky.html">OpenSky package API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shipping.html">Shipping package API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streetlight.html">Streetlight package API</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">COVID Atmospheric Ancillary Data Agglomerator (CAADA)</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>CA PEMS package API</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/module_docs/ca_pems.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="ca-pems-package-api">
+<h1>CA PEMS package API<a class="headerlink" href="#ca-pems-package-api" title="Permalink to this headline">¶</a></h1>
+<p>This package focuses on reading data from the <a class="reference external" href="http://pems.dot.ca.gov/">Caltrans PEMS website</a>. Its primary focus is
+on data available through the Data Clearinghouse. Currently, it has support for the “station” files only. Support for
+other file types (FasTrak, weights, etc.) will be added as time and demand permit.</p>
+<div class="section" id="module-caada.ca_pems.agglomeration">
+<span id="module-agglomeration"></span><h2>Module: agglomeration<a class="headerlink" href="#module-caada.ca_pems.agglomeration" title="Permalink to this headline">¶</a></h2>
+<p>This module contains functions for agglomerating Caltrans PEMS data to various spatial domains and saving the
+result as a netCDF files.</p>
+<dl class="py function">
+<dt id="caada.ca_pems.agglomeration.agglomerate_by_county">
+<code class="sig-prename descclassname">caada.ca_pems.agglomeration.</code><code class="sig-name descname">agglomerate_by_county</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pems_root</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">meta_root</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">save_path</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">min_percent_observed</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>int<span class="p">, </span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">75</span></em>, <em class="sig-param"><span class="n">variables</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">'samples', 'total flow'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#caada.ca_pems.agglomeration.agglomerate_by_county" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sum vehicle counts from PEMS station data to the county level.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This function has not been optimized and so applying it to 5 min data will consume 10s of GB of memory.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pems_root</strong> – The root directory containing the PEMS station data. It must be organized into subdirectories named <cite>d03</cite>, <cite>d04</cite>
+etc. where each subdirectory contains the data files for one district (e.g. <cite>d03</cite> has District 3 files). These
+directories may contain files of only ONE time resolution (i.e. day and 5-minute data may not be mixed).
+The <a class="reference internal" href="#caada.ca_pems.files.sort_pems_files" title="caada.ca_pems.files.sort_pems_files"><code class="xref py py-func docutils literal notranslate"><span class="pre">sort_pems_files()</span></code></a> function in the <a class="reference internal" href="#module-caada.ca_pems.files" title="caada.ca_pems.files"><code class="xref py py-mod docutils literal notranslate"><span class="pre">files</span></code></a> module will
+place files in the correct organization.</p></li>
+<li><p><strong>meta_root</strong> – The root directory containing the PEMS station metadata. It must have the same organization as <cite>pems_root</cite>, i.e.
+subdirectories named <cite>d03</cite>, <cite>d04</cite>, etc. that contain metadata for that particular district.</p></li>
+<li><p><strong>save_path</strong> – The name to give the netCDF file produced. Will be overwritten if exists!</p></li>
+<li><p><strong>min_percent_observed</strong> – Each measurement in the PEMS station files indicates how much of its data was observed and how much was
+estimated. This sets the minimum percent which must come from observations for that data point to be
+included in the sum.</p></li>
+<li><p><strong>variables</strong> – Which variables from the PEMS data should be saved in the netCDF file. Only “samples” and “total flow” are
+currently implemented.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-caada.ca_pems.exceptions">
+<span id="module-exceptions"></span><h2>Module: exceptions<a class="headerlink" href="#module-caada.ca_pems.exceptions" title="Permalink to this headline">¶</a></h2>
+<p>This module contains custom exceptions specific to Caltrans PEMS data.</p>
+<dl class="py exception">
+<dt id="caada.ca_pems.exceptions.SiteMetadataError">
+<em class="property">exception </em><code class="sig-prename descclassname">caada.ca_pems.exceptions.</code><code class="sig-name descname">SiteMetadataError</code><a class="headerlink" href="#caada.ca_pems.exceptions.SiteMetadataError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Error type to use for problems with site metadata.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-caada.ca_pems.files">
+<span id="module-files"></span><h2>Module: files<a class="headerlink" href="#module-caada.ca_pems.files" title="Permalink to this headline">¶</a></h2>
+<p>This module contains functions to organize PEMS files into the directory structure required by the
+<a class="reference internal" href="#module-caada.ca_pems.agglomeration" title="caada.ca_pems.agglomeration"><code class="xref py py-mod docutils literal notranslate"><span class="pre">agglomeration</span></code></a> module.</p>
+<dl class="py function">
+<dt id="caada.ca_pems.files.sort_pems_files">
+<code class="sig-prename descclassname">caada.ca_pems.files.</code><code class="sig-name descname">sort_pems_files</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pems_root</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">meta_root</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">pems_files</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">delete_orig</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">decompress</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">dry_run</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#caada.ca_pems.files.sort_pems_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort PEMS station data and metadata files into the appropriate directory structure for agglomeration.</p>
+<p>The <a class="reference internal" href="#module-caada.ca_pems.agglomeration" title="caada.ca_pems.agglomeration"><code class="xref py py-mod docutils literal notranslate"><span class="pre">agglomeration</span></code></a> module assumes a certain directory structure to help it find the PEMS files.
+This function takes a list of unsorted files and puts them into the correct structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pems_root</strong> – Directory where the PEMS data should be placed. This directory must exist already.</p></li>
+<li><p><strong>meta_root</strong> – Directory where the PEMS metadata should be placed. This directory must exist already.</p></li>
+<li><p><strong>pems_files</strong> – List of PEMS files (data and metadata) to sort. Note that different time resolutions of PEMS data <em>cannot</em> go
+into the same data root, so this list must contain data files at a single time resolution.</p></li>
+<li><p><strong>delete_orig</strong> – Whether to delete the original files after they are copied into the data and metadata directories.</p></li>
+<li><p><strong>decompress</strong> – Whether to decompress gzipped files (ending in <cite>.gz</cite>). If <cite>delete_orig</cite> is <cite>False</cite>, the <cite>.gz</cite> files are kept,
+if it is <cite>True</cite> then they are deleted after unzipping.</p></li>
+<li><p><strong>dry_run</strong> – If <cite>True</cite>, then no actions are actually taken to the files, this function will simply print what it will do.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-caada.ca_pems.metadata">
+<span id="module-metadata"></span><h2>Module: metadata<a class="headerlink" href="#module-caada.ca_pems.metadata" title="Permalink to this headline">¶</a></h2>
+<p>This modules contains functions to find Caltrans PEMS station metadata for specific sites or dates. Actually reading
+the metadata files is handled by the <a class="reference internal" href="#module-caada.ca_pems.readers" title="caada.ca_pems.readers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">readers</span></code></a> module.</p>
+<dl class="py function">
+<dt id="caada.ca_pems.metadata.get_metadata_for_date">
+<code class="sig-prename descclassname">caada.ca_pems.metadata.</code><code class="sig-name descname">get_metadata_for_date</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">metadata_dir</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">date</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>datetime.datetime<span class="p">, </span>pandas._libs.tslibs.timestamps.Timestamp<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="headerlink" href="#caada.ca_pems.metadata.get_metadata_for_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dataframe containing all metadata that applies to a given date.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metadata_dir</strong> – The directory containing the metadata files. This is the actual directory, not the root (i.e. you must point
+to one of the <cite>dXX</cite> files under the metadata root).</p></li>
+<li><p><strong>date</strong> – Which date to get metadata for.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dataframe indexed by site ID containing the various metadata values.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="caada.ca_pems.metadata.get_metadata_for_multi_sites_on_date">
+<code class="sig-prename descclassname">caada.ca_pems.metadata.</code><code class="sig-name descname">get_metadata_for_multi_sites_on_date</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">metadata_dir</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">site_ids</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>int<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">date</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>datetime.datetime<span class="p">, </span>pandas._libs.tslibs.timestamps.Timestamp<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="headerlink" href="#caada.ca_pems.metadata.get_metadata_for_multi_sites_on_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get metadata for multiple sites on a single date.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metadata_dir</strong> – The directory containing the metadata files. This is the actual directory, not the root (i.e. you must point
+to one of the <cite>dXX</cite> files under the metadata root).</p></li>
+<li><p><strong>site_ids</strong> – A list of the ID numbers of the sites to get the metadata for. Each ID number will have a corresponding row
+in the returned dataframe.</p></li>
+<li><p><strong>date</strong> – Which date to get metadata for. May be given as a string Pandas recognizes as a date format.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dataframe indexed by site ID containing the various metadata values.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="caada.ca_pems.metadata.get_metadata_for_site_on_date">
+<code class="sig-prename descclassname">caada.ca_pems.metadata.</code><code class="sig-name descname">get_metadata_for_site_on_date</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">metadata_dir</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">site_id</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">date</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>datetime.datetime<span class="p">, </span>pandas._libs.tslibs.timestamps.Timestamp<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; pandas.core.series.Series<a class="headerlink" href="#caada.ca_pems.metadata.get_metadata_for_site_on_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get metadata for a specific site on a specific date.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metadata_dir</strong> – The directory containing the metadata files. This is the actual directory, not the root (i.e. you must point
+to one of the <cite>dXX</cite> files under the metadata root).</p></li>
+<li><p><strong>site_id</strong> – The ID number of the site to get the metadata for.</p></li>
+<li><p><strong>date</strong> – Which date to get metadata for. May be given as a string Pandas recognizes as a date format.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A series with the metadata for that specific site. Also includes which file this information was read from.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.Series</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#caada.ca_pems.exceptions.SiteMetadataError" title="caada.ca_pems.exceptions.SiteMetadataError"><strong>SiteMetadataError</strong></a> – If a site with the requested ID cannot be found in any file in the given directory.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="caada.ca_pems.metadata.get_metadata_for_site_over_dates">
+<code class="sig-prename descclassname">caada.ca_pems.metadata.</code><code class="sig-name descname">get_metadata_for_site_over_dates</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">metadata_dir</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">site_id</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">dates</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Union<span class="p">[</span>datetime.datetime<span class="p">, </span>pandas._libs.tslibs.timestamps.Timestamp<span class="p">]</span><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="headerlink" href="#caada.ca_pems.metadata.get_metadata_for_site_over_dates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get metadata for a specific site on multiple dates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metadata_dir</strong> – The directory containing the metadata files. This is the actual directory, not the root (i.e. you must point
+to one of the <cite>dXX</cite> files under the metadata root).</p></li>
+<li><p><strong>site_id</strong> – The ID number of the site to get the metadata for.</p></li>
+<li><p><strong>dates</strong> – A list of dates to get metadata for. May be given as a string Pandas recognizes as a date format. Each date
+will have a corresponding row in the returned dataframe.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dataframe indexed by date containing the various metadata values.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-caada.ca_pems.readers">
+<span id="module-readers"></span><h2>Module: readers<a class="headerlink" href="#module-caada.ca_pems.readers" title="Permalink to this headline">¶</a></h2>
+<p>This module contains functions to read Caltrans PEMS station data and metadata files.</p>
+<dl class="py function">
+<dt id="caada.ca_pems.readers.read_pems_station_csv">
+<code class="sig-prename descclassname">caada.ca_pems.readers.</code><code class="sig-name descname">read_pems_station_csv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">csv_file</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="headerlink" href="#caada.ca_pems.readers.read_pems_station_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a Caltrans PEMS daily station .csv file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>csv_file</strong> – The path to the PEMS file to read</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>A dataframe containing the PEMS data with the correct header</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="caada.ca_pems.readers.read_pems_station_meta">
+<code class="sig-prename descclassname">caada.ca_pems.readers.</code><code class="sig-name descname">read_pems_station_meta</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="headerlink" href="#caada.ca_pems.readers.read_pems_station_meta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a PEMS station metadata file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> – Path to the metadata tab-delimited file to read.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dataframe, indexed by site ID, containing the metadata from the requested file.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="eia.html" class="btn btn-neutral float-right" title="EIA package API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to CAADA’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Joshua Laughner
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
