@@ -1,18 +1,18 @@
+"""
+This module contains functions for agglomerating Caltrans PEMS data to various spatial domains and saving the
+result as a netCDF files.
+"""
+
 import netCDF4 as ncdf
 import numpy as np
 import pandas as pd
 from pathlib import Path
 import re
-import time
 
 from jllutils.subutils import ncdf as ncio
-from jllutils.miscutils import ProgressMessage
 
 from . import readers, metadata, ancillary
 from .. import common_utils, common_ancillary
-from typing import Optional
-from ..caada_errors import \
-    DimensionError
 from ..caada_typing import \
     pathlike as _pathlike, \
     scalarnum as _scalarnum, \
@@ -24,13 +24,47 @@ from ..caada_typing import \
 # TODO: make this its own repo and record commit info in the netCDF file. I wrote a VCS module somewhere, use that.
 def cl_dispatcher(spatial_resolution='county', **kwargs):
     if spatial_resolution == 'county':
-        return agglomerate_by_country(**kwargs)
+        return agglomerate_by_county(**kwargs)
     else:
         raise ValueError('Unknown spatial resolution "{}"'.format(spatial_resolution))
 
 
-def agglomerate_by_country(pems_root: _pathlike, meta_root: _pathlike, save_path: _pathlike,
-                           min_percent_observed: _scalarnum = 75, variables: _strseq = ('samples', 'total flow')):
+def agglomerate_by_county(pems_root: _pathlike, meta_root: _pathlike, save_path: _pathlike,
+                          min_percent_observed: _scalarnum = 75, variables: _strseq = ('samples', 'total flow')):
+    """Sum vehicle counts from PEMS station data to the county level.
+
+    .. warning:: This function has not been optimized and so applying it to 5 min data will consume 10s of GB of memory.
+
+    Parameters
+    ----------
+    pems_root
+        The root directory containing the PEMS station data. It must be organized into subdirectories named `d03`, `d04`
+        etc. where each subdirectory contains the data files for one district (e.g. `d03` has District 3 files). These
+        directories may contain files of only ONE time resolution (i.e. day and 5-minute data may not be mixed).
+        The :func:`~caada.ca_pems.files.sort_pems_files` function in the :mod:`~caada.ca_pems.files` module will
+        place files in the correct organization.
+
+    meta_root
+        The root directory containing the PEMS station metadata. It must have the same organization as `pems_root`, i.e.
+        subdirectories named `d03`, `d04`, etc. that contain metadata for that particular district.
+
+    save_path
+        The name to give the netCDF file produced. Will be overwritten if exists!
+
+    min_percent_observed
+        Each measurement in the PEMS station files indicates how much of its data was observed and how much was
+        estimated. This sets the minimum percent which must come from observations for that data point to be
+        included in the sum.
+
+    variables
+        Which variables from the PEMS data should be saved in the netCDF file. Only "samples" and "total flow" are
+        currently implemented.
+
+    Returns
+    -------
+    None
+
+    """
     pems_root = Path(pems_root)
     meta_root = Path(meta_root)
     save_path = Path(save_path)

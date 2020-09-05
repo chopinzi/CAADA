@@ -26,6 +26,10 @@ def read_airport_codes(source: str = 'openflights', update: str = 'never') -> pd
     -------
     pandas.DataFrame
         A dataframe containing geographic data about global airports. The exact data available depends on the source.
+
+    Notes
+    -----
+    This data is automatically added to dataframes returned by :func:`read_opensky_covid_file`.
     """
     web._download_airport_codes(source, update=update)
     local_file = get_airport_code_source(source)['local']
@@ -39,7 +43,10 @@ def read_airport_codes(source: str = 'openflights', update: str = 'never') -> pd
 
 
 def read_opensky_covid_file(filename: pathlike, code_source: str = 'openflights', update_codes: str = 'never') -> pd.DataFrame:
-    """Read a .csv file from https://doi.org/10.5194/essd-2020-223
+    """Read a .csv file prepared by Strohmeier et al. 2020 (ESSDD).
+
+    `Strohmeier et al. <https://essd.copernicus.org/preprints/essd-2020-223/>`_ prepared .csv file of OpenSky flight data
+    during 2019 and 2020 to support COVID-19 research. This function will read one of those .csv files into a dataframe.
 
     Parameters
     ----------
@@ -56,7 +63,7 @@ def read_opensky_covid_file(filename: pathlike, code_source: str = 'openflights'
     -------
     pandas.DataFrame
         A dataframe with the information from the .csv file. It will be joined with geographic data: columns prepended
-        with "origin_" and "dest_" are the geographic data for the origin and destination airports, respectively.
+        with "origin\_" and "dest\_" are the geographic data for the origin and destination airports, respectively.
     """
     logger.info('Reading %s', filename)
     df = pd.read_csv(filename, parse_dates=['firstseen', 'lastseen', 'day'])

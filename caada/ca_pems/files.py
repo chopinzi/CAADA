@@ -1,3 +1,9 @@
+"""
+This module contains functions to organize PEMS files into the directory structure required by the
+:mod:`~caada.ca_pems.agglomeration` module.
+"""
+
+
 import gzip
 from pathlib import Path
 import os
@@ -11,6 +17,38 @@ from ..caada_typing import pathlike
 
 def sort_pems_files(pems_root: pathlike, meta_root: pathlike, pems_files: Sequence[pathlike], delete_orig=False,
                     decompress=True, dry_run=False):
+    """Sort PEMS station data and metadata files into the appropriate directory structure for agglomeration.
+
+    The :mod:`~caada.ca_pems.agglomeration` module assumes a certain directory structure to help it find the PEMS files.
+    This function takes a list of unsorted files and puts them into the correct structure.
+
+    Parameters
+    ----------
+    pems_root
+        Directory where the PEMS data should be placed. This directory must exist already.
+
+    meta_root
+        Directory where the PEMS metadata should be placed. This directory must exist already.
+
+    pems_files
+        List of PEMS files (data and metadata) to sort. Note that different time resolutions of PEMS data *cannot* go
+        into the same data root, so this list must contain data files at a single time resolution.
+
+    delete_orig
+        Whether to delete the original files after they are copied into the data and metadata directories.
+
+    decompress
+        Whether to decompress gzipped files (ending in `.gz`). If `delete_orig` is `False`, the `.gz` files are kept,
+        if it is `True` then they are deleted after unzipping.
+
+    dry_run
+        If `True`, then no actions are actually taken to the files, this function will simply print what it will do.
+
+    Returns
+    -------
+    None
+
+    """
     pems_root = Path(pems_root)
     meta_root = Path(meta_root)
 

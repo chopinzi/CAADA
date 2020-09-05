@@ -11,6 +11,11 @@ from ..caada_errors import ExcelParsingError
 def parse_oakland_excel(excel_file: Union[bytes, pathlike], is_contents=False) -> pd.DataFrame:
     """Parse an Excel sheet with container moves from the Port of Oakland
 
+    This parses the Excel file found on the `Port of Oakland page <https://www.oaklandseaport.com/performance/facts-figures/>`_
+    (as of 2020-09-04). You can use this if you've downloaded that file manually, but it is automatically downloaded
+    by :func:`~caada.shipping.web.get_oakland_container_data` and parsed with this function, so you usually do not
+    need to do so.
+
     Parameters
     ----------
     excel_file

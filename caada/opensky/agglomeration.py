@@ -8,9 +8,38 @@ from jllutils.subutils import ncdf as ncio
 
 from . import readers, _my_dir
 from ..caada_logging import logger
+from ..caada_typing import pathlike, pathseq, strseq
 
 
-def summarize_and_merge_covid_files(filenames, savename):
+def summarize_and_merge_covid_files(filenames: pathseq, savename: pathlike):
+    """Summarize Strohmeier et al. COVID-19 OpenSky files into a single netCDF file
+
+    This will take a list of .csv files from `Strohmeier et al. <https://essd.copernicus.org/preprints/essd-2020-223/>`_
+    and summarize them into a single netCDF file with the number of arrivals and departures from each airport for each
+    day, further broken down into international, domestic, and all flights. Additional metadata about the airports
+    is retrieved from `Openflights <https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat>`_
+    and saved in the netCDF file.
+
+    Parameters
+    ----------
+    filenames
+        The list of .csv files to summarize
+
+    savename
+        The name to give the resulting netCDF file. Will be overwritten if already exists!
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+
+    Airport information from `Openflights <https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat>`_
+    is used to determine whether a flight is domestic or international. If an airport code is not included in the
+    Openflights database, then flights to/from it cannot be properly categorized.
+
+    """
     def reorder_list(orig_list, new_order):
         return [orig_list[i] for i in new_order]
 
@@ -62,7 +91,36 @@ def summarize_and_merge_covid_files(filenames, savename):
     save_covid_netcdf(savename=savename, data=final_data, times=dtindex, codes=all_codes)
 
 
-def summarize_opensky_covid_file(filename, avg_to, output='array'):
+def summarize_opensky_covid_file(filename: pathlike, avg_to: str, output: str = 'array'):
+    """Create the summary of a single Strohmeier et al. .csv file
+
+    Parameters
+    ----------
+    filename
+        Path to the .csv file to summarize
+
+    avg_to
+        One of the strings "day" or "month", controls whether the summary returned sums up data over individual days
+        or months.
+
+    output
+        Controls what is returned. Currently "array" is the only valid value here.
+
+    Returns
+    -------
+    dict
+        A dict of dicts, the first level will have keys "departures" and "arrivals" and the second level will have
+        keys "all", "domestic", and "international". The values of the second levels are arrays whose first dimensions
+        are time and whose second dimensions are airport. These are the number of arrivals or departures for each
+        airport in the time frame requested.
+
+    strseq
+        The list of ICAO airport codes that correspond to the second dimension of the arrays.
+
+    Sequence[pandas.Timestamp]
+        The list of dates that correspond to the first dimension of the arrays. If "month" was given as the value for
+        `avg_to`, then these will be the first date of each month.
+    """
     df = readers.read_opensky_covid_file(filename)
     all_codes = set(df['origin'].dropna().tolist()).union(df['destination'].dropna().tolist())
 
@@ -70,9 +128,11 @@ def summarize_opensky_covid_file(filename, avg_to, output='array'):
     if avg_to == 'day':
         groups = df['day'].dt.dayofyear
         date_fxn = lambda d, y=yr: pd.Timestamp(y - 1, 12, 31) + pd.Timedelta(days=d)
-    else:
+    elif avg_to == 'month':
         groups = df['day'].dt.month
         date_fxn = lambda m, y=yr: pd.Timestamp(y, m, 1)
+    else:
+        raise ValueError('Bad value for avg_to: {}'.format(avg_to))
 
     if output == 'dataframe':
         raise NotImplementedError('Summarizing to dataframe not yet implemented')

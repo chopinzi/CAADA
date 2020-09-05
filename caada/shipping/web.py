@@ -31,6 +31,20 @@ def _convert_la_numbers(val):
 
 
 def get_all_la_port_container_data(index: str = 'datetime') -> pd.DataFrame:
+    """Get Port of LA container data for all years from 1995 to present.
+
+    Parameters
+    ----------
+    index
+        How to index the dataframe. See the `index` parameter in :func:`get_la_port_container_data` for details.
+
+    Returns
+    -------
+    pandas.DataFrame
+        A dataframe containing data for all years. Will be container moves broken down by import vs. export and
+        empty vs. full.
+
+    """
     this_year = pd.Timestamp.now().year
     dfs = []
     for yr in range(1995, this_year+1):
@@ -56,7 +70,8 @@ def get_la_port_container_data(year: int, index: str = 'datetime') -> pd.DataFra
     Returns
     -------
     pd.DataFrame
-        A dataframe containing the data for the requested year.
+        A dataframe containing the data for the requested year. Will be container moves broken down by import vs. export
+        and empty vs. full.
 
     """
     if index == 'datetime':
@@ -68,7 +83,7 @@ def get_la_port_container_data(year: int, index: str = 'datetime') -> pd.DataFra
 
     r = requests.get('https://www.portoflosangeles.org/business/statistics/container-statistics/historical-teu-statistics-{:04d}'.format(year))
     if r.status_code == 200:
-        return parse_la_port_html(r.content, parse_year)
+        return _parse_la_port_html(r.content, parse_year)
     elif r.status_code == 404:
         # Page not found, usually because you asked for a year that isn't online
         raise HTMLRequestError('Failed to retrieve the Port of LA page for {}. Their server may be down, or the '
@@ -77,7 +92,7 @@ def get_la_port_container_data(year: int, index: str = 'datetime') -> pd.DataFra
         raise HTMLRequestError('Failed to retrieve the Port of LA page for {}. HTML response code was {}'.format(year, r.status_code))
 
 
-def parse_la_port_html(html: stringlike, year: Optional[int] = None) -> pd.DataFrame:
+def _parse_la_port_html(html: stringlike, year: Optional[int] = None) -> pd.DataFrame:
     """Parse LA port container data from HTML into a dataframe.
 
     Parameters
