@@ -1,3 +1,4 @@
+import itertools
 import netCDF4 as ncdf
 import numpy as np
 import pandas as pd
@@ -13,15 +14,18 @@ def summarize_and_merge_covid_files(filenames, savename):
     def reorder_list(orig_list, new_order):
         return [orig_list[i] for i in new_order]
 
-    data = {'arrivals': [], 'departures': []}
+    data = {'{}_{}'.format(end, group): [] for end, group in itertools.product(['departures', 'arrivals'], ['all', 'domestic', 'international'])}
     codes = []
     times = []
 
     for i, f in enumerate(filenames, start=1):
         logger.info('Reading %s (%d of %d)', f, i, len(filenames))
-        departure_counts, arrival_counts, iaca_codes, these_times = summarize_opensky_covid_file(f, 'day', output='array')
-        data['departures'].append(departure_counts)
-        data['arrivals'].append(arrival_counts)
+        counts, iaca_codes, these_times = summarize_opensky_covid_file(f, 'day', output='array')
+        for end, end_dicts in counts.items():
+            for group, group_counts in end_dicts.items():
+                key = '{}_{}'.format(end, group)
+                data[key].append(group_counts)
+
         codes.append(iaca_codes)
         times.append(these_times)
 
@@ -83,25 +87,37 @@ def _summarize_opensky_to_array(df, groups, all_codes, date_fxn):
     ncode = len(all_codes)
     ndates = groups.unique().size
 
-    origin_counts_arr = np.zeros([ndates, ncode], dtype=np.int32)
-    dest_counts_arr = np.zeros([ndates, ncode], dtype=np.int32)
+    count_arrs = {'departures': {k: np.zeros([ndates, ncode], dtype=np.int32) for k in ('all', 'domestic', 'international')},
+                  'arrivals': {k: np.zeros([ndates, ncode], dtype=np.int32) for k in ('all', 'domestic', 'international')}}
 
     df['counter'] = 1  # use for sum
-    origin_counts = df.groupby([groups, 'origin']).sum()['counter']
-    dest_counts = df.groupby([groups, 'destination']).sum()['counter']
+    xxdom = df['origin_country_name'].fillna('UORIG') == df['dest_country_name'].fillna('UDEST')
+    dom_df = df[xxdom]
+    intl_df = df[~xxdom]
 
-    unique_tinds = sorted(set(origin_counts.index.get_level_values(0)).union(dest_counts.index.get_level_values(0)))
+    counts = {'departures':
+                  {'all': df.groupby([groups, 'origin']).sum()['counter'],
+                   'domestic': dom_df.groupby([groups, 'origin']).sum()['counter'],
+                   'international': intl_df.groupby([groups, 'origin']).sum()['counter']},
+              'arrivals':
+                  {'all': df.groupby([groups, 'destination']).sum()['counter'],
+                   'domestic': dom_df.groupby([groups, 'destination']).sum()['counter'],
+                   'international': intl_df.groupby([groups, 'destination']).sum()['counter']}}
+
+    origin_tinds = counts['departures']['all'].index.get_level_values(0)
+    dest_tinds = counts['arrivals']['all'].index.get_level_values(0)
+
+    unique_tinds = sorted(set(origin_tinds).union(dest_tinds))
     unique_times = [date_fxn(d) for d in unique_tinds]
 
     for i, t in enumerate(unique_tinds):
-        if origin_counts.index.get_level_values(0).isin([t]).any():
-            sub_orig = origin_counts.xs(t).reindex(all_codes).fillna(0)
-            origin_counts_arr[i, :] = sub_orig.to_numpy()
-        if dest_counts.index.get_level_values(0).isin([t]).any():
-            sub_dest = dest_counts.xs(t).reindex(all_codes).fillna(0)
-            dest_counts_arr[i, :] = sub_dest.to_numpy()
+        for end, end_dicts in counts.items():
+            for status, status_df in end_dicts.items():
+                if status_df.index.get_level_values(0).isin([t]).any():
+                    sub_df = status_df.xs(t).reindex(all_codes).fillna(0)
+                    count_arrs[end][status][i, :] = sub_df.to_numpy()
 
-    return origin_counts_arr, dest_counts_arr, all_codes, unique_times
+    return count_arrs, all_codes, unique_times
 
 
 def _summarize_opensky_to_df(df, groups, all_codes, date_fxn):
@@ -111,11 +127,11 @@ def _summarize_opensky_to_df(df, groups, all_codes, date_fxn):
 
     n = groups.unique().size * len(all_codes)
     print(n)
-    pbar = miscutils.ProgressBar(n, prefix='Summarizing', style='bar+percent')
+    #pbar = miscutils.ProgressBar(n, prefix='Summarizing', style='bar+percent')
     for _, date_df in df.groupby(groups):
         this_date = date_fxn(date_df['day'].iloc[0])
         for code in all_codes:
-            pbar.print_bar()
+            #pbar.print_bar()
             mi_tuples.append((this_date, code))
             this_dict = get_info(date_df, code)
             for k, v in this_dict.items():

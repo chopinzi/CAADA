@@ -2,13 +2,29 @@
 [opensky-covid.airport]
 description = "IACO code for the airport"
 
-[opensky-covid.arrivals]
+[opensky-covid.arrivals_all]
 units = "#"
 description = "Number of flights inferred to have each airport as a destination given their flight path when last seen"
 
-[opensky-covid.departures]
+[opensky-covid.arrivals_domestic]
+units = "#"
+description = "Number of flights inferred to have each airport as a destination that originated at an airport in the same country"
+
+[opensky-covid.arrivals_international]
+units = "#"
+description = "Number of flights inferred to have each airport as a destination that originated at an airport in a different country"
+
+[opensky-covid.departures_all]
 units = "#"
 description = "Number of flights inferred to have each airport as an origin given their flight path when last seen"
+
+[opensky-covid.departures_domestic]
+units = "#"
+description = "Number of flights inferred to have each airport as an origin that went to an airport in the same country"
+
+[opensky-covid.departures_international]
+units = "#"
+description = "Number of flights inferred to have each airport as an origin that went to an airport in a different country"
 
 [opensky-covid.iata_code]
 description = "IATA airport code"
