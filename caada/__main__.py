@@ -4,7 +4,7 @@ import sys
 from .caada_logging import set_log_level
 from .ca_pems.__main__ import parse_ca_pems_agg_args, parse_ca_pems_orgfiles_args
 from .opensky.__main__ import parse_opensky_covid_agg_args
-
+from .epa_cems.__main__ import parse_cems_download_args
 
 def parse_args():
     p = ArgumentParser(description='Agglomerate various datasets into netCDF files')
@@ -22,6 +22,9 @@ def parse_args():
 
     os_covid = subp.add_parser('os-covid', help='Agglomerate OpenSky-derived COVID .csvs into one netCDF')
     parse_opensky_covid_agg_args(os_covid)
+
+    epa_cems_dl = subp.add_parser('epa-cems-dl', help='Download US EPA CEMS data')
+    parse_cems_download_args(epa_cems_dl)
 
     return vars(p.parse_args())
 

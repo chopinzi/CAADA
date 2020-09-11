@@ -20,6 +20,12 @@ _state_gdf.rename(columns=lambda s: s.lower(), inplace=True)
 _state_gdf.sort_values('name', inplace=True)
 _state_gdf['statefp'] = _state_gdf['statefp'].astype('int')
 
+conus_states = ('AL', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'ID',
+                'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI',
+                'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY',
+                'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN',
+                'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY')
+
 
 def _standardize_input_ids(county_ids, state_ids):
     if county_ids is None and state_ids is None:
