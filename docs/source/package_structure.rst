@@ -21,6 +21,7 @@ documentation below for details.
 
    module_docs/ca_pems.rst
    module_docs/eia.rst
+   module_docs/epa.rst
    module_docs/opensky.rst
    module_docs/shipping.rst
    module_docs/streetlight.rst

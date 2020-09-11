@@ -24,5 +24,6 @@ Available subcommands
 
 * `ca-pems` allows you to create a netCDF file of Caltrans PEMS station data.
 * `org-pems` will help organize Caltrans PEMS station data into the correct directory structure for `ca-pems`.
+* `epa-cems-dl` will help download US EPA CEMS data.
 * `os-covid` will create a summary netCDF file of `Strohmeier et al. <https://essd.copernicus.org/preprints/essd-2020-223/>`_
   OpenSky-derived .csv files of aircraft flights.
