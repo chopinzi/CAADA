@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import re
 import xlrd
 
 from typing import Union
@@ -35,8 +36,10 @@ def parse_oakland_excel(excel_file: Union[bytes, pathlike], is_contents=False) -
         wb = secure_open_workbook(file_contents=excel_file)
     else:
         wb = secure_open_workbook(excel_file)
-    sheet_dfs = [_parse_oakland_sheet(s, wb.datemode) for s in wb.sheets()]
-    return pd.concat(sheet_dfs, axis=0)
+    if len(wb.sheets()) != 1:
+        raise ExcelParsingError('Oakland Excel file does not consist of a single sheet - the format may have changed')
+    else:
+        return _parse_oakland_sheet(wb.sheets()[0], wb.datemode)
 
 
 def _verify_oakland_sheet(sheet: xlrd.sheet.Sheet):
@@ -44,27 +47,33 @@ def _verify_oakland_sheet(sheet: xlrd.sheet.Sheet):
 
     Raises `ExcelParsingError` if not.
     """
+    keys = dict()
     reasons = []
     _cols = ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H')
-    # row index, column index, expected contents
-    checks = [(4, 1, 'FULL'),
-              (4, 4, 'EMPTY'),
-              (4, 7, 'Grand'),
-              (5, 1, 'Inbound'),
-              (5, 2, 'Outbound'),
-              (5, 3, 'Total'),
-              (5, 4, 'Inbound'),
-              (5, 5, 'Outbound'),
-              (5, 6, 'Total'),
-              (5, 7, 'Total')]
-    for r, c, val in checks:
-        if sheet.cell_value(r, c) != val:
+    # row index, column index, expected contents, whether this column is a column name for the dataframe
+    checks = [(2, 0, 'Year', False),
+              (2, 1, 'Month', False),
+              (2, 2, 'Import Full', True),
+              (2, 3, 'Export Full', True),
+              (2, 4, 'Total Full', True),
+              (2, 5, 'Import Empty', True),
+              (2, 6, 'Export Empty', True),
+              (2, 7, 'Total Empty', True),
+              (2, 8, 'Grand Total', True)]
+    for r, c, val, is_key in checks:
+        # Replace any whitespace with a single space (e.g. newlines)
+        sheet_val = re.sub(r'\s+', ' ', sheet.cell_value(r, c))
+        if sheet_val != val:
             msg = '{}{} != {}'.format(_cols[c], r + 1, val)
             reasons.append(msg)
+        elif is_key:
+            keys[sheet_val] = c
 
     if len(reasons) > 0:
         msg = 'Unexpected sheet format ({})'.format(', '.join(reasons))
         raise ExcelParsingError(msg)
+    else:
+        return keys
 
 
 def _parse_oakland_sheet(sheet: xlrd.sheet.Sheet, datemode: int):
@@ -86,26 +95,25 @@ def _parse_oakland_sheet(sheet: xlrd.sheet.Sheet, datemode: int):
     # Assume the first 6 rows are just header, and verify that the columns are in order
     # date, full imports, full exports, total full, empty imports, empty expots, total empty
     # grand total
-    _verify_oakland_sheet(sheet)
+    keys = _verify_oakland_sheet(sheet)
 
-    date_col = sheet.col(0)
+    nrow = len(sheet.col(0))
     dates = []
-    keys = ['Full Imports', 'Full Exports', 'Full Total', 'Empty Imports', 'Empty Exports', 'Empty Total',
-            'Total TEUs']
     data = {k: [] for k in keys}
-    for irow, cell in enumerate(date_col[6:], start=6):
-        if isinstance(cell.value, str) and len(cell.value) == 0:
+    for irow in range(3, nrow):
+        year = sheet.cell_value(irow, 0)
+        month = sheet.cell_value(irow, 1)
+        if isinstance(month, str) and month == 'Annual Total':
             continue
 
-        this_date = xlrd.xldate_as_datetime(cell.value, datemode)
-        if this_date < pd.Timestamp(1990, 1, 1):
-            # In the first sheets, there's only proper dates in the first column. However, in
-            # the 17-18 sheet, they put the year in the date column for the total row. This gets
-            # parsed as an early date, so we skip if the date is before 1990
-            continue
+        this_date = pd.to_datetime('{} {:.0f}'.format(month, year))
+        if this_date < pd.Timestamp(1990, 1, 1) or this_date > pd.Timestamp.now():
+            # This may catch some bad date parsing. I haven't had a problem with this, but want to check (in case they
+            # change the format unexpectedly).
+            raise ExcelParsingError('Unexpected date parsed (pre-1990)')
 
         dates.append(this_date)
-        for icol, k in enumerate(keys, start=1):
+        for k, icol in keys.items():
             val = sheet.cell_value(irow, icol)
             if isinstance(val, str) and len(val) == 0:
                 data[k].append(np.nan)
@@ -113,4 +121,7 @@ def _parse_oakland_sheet(sheet: xlrd.sheet.Sheet, datemode: int):
                 data[k].append(val)
 
     dates = pd.DatetimeIndex(dates)
-    return pd.DataFrame(data, index=dates).drop(columns=['Full Total', 'Empty Total'])
+    colname_mapping = {'Import Full': 'Full Imports', 'Export Full': 'Full Exports',
+                       'Import Empty': 'Empty Imports', 'Export Empty': 'Empty Exports',
+                       'Grand Total': 'Total TEUs'}
+    return pd.DataFrame(data, index=dates).drop(columns=['Total Full', 'Total Empty']).rename(columns=colname_mapping)
