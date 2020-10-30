@@ -113,6 +113,8 @@ def get_metadata_for_site_over_dates(metadata_dir: _pathlike, site_id: int, date
         meta_df = readers.read_pems_station_meta(file_name)
         if site_id in meta_df.index:
             rows.append((file_date, meta_df.loc[site_id, :]))
+    if len(rows) == 0:
+        raise exceptions.NoSiteMetadataError('Cannot find metadata for site {} in directory {}'.format(site_id, metadata_dir))
     row_dates, row_series = zip(*rows)
     meta_df = pd.concat(row_series, axis=1).T.reset_index(drop=True)
     row_dates = pd.DatetimeIndex(row_dates)

@@ -8,10 +8,11 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 import re
+import sys
 
 from jllutils.subutils import ncdf as ncio
 
-from . import readers, metadata, ancillary
+from . import readers, metadata, ancillary, exceptions
 from .. import common_utils, common_ancillary
 from ..caada_typing import \
     pathlike as _pathlike, \
@@ -122,8 +123,13 @@ def _add_county_ids(df: pd.DataFrame, metadata_dir: _pathlike):
     df['county id'] = -99
     for sid, sid_df in df.groupby('station'):
         times = sid_df['timestamp'].unique()
-        meta_df = metadata.get_metadata_for_site_over_dates(metadata_dir, sid, times)
-        df.loc[df['station'] == sid, 'county id'] = meta_df.loc[sid_df['timestamp'], 'county'].to_numpy()
+        try:
+            meta_df = metadata.get_metadata_for_site_over_dates(metadata_dir, sid, times)
+        except exceptions.NoSiteMetadataError:
+            print('WARNING: no metadata found for station {} in directory {}'.format(sid, metadata_dir), file=sys.stderr)
+            pass
+        else:
+            df.loc[df['station'] == sid, 'county id'] = meta_df.loc[sid_df['timestamp'], 'county'].to_numpy()
 
     # Make sure that NaNs are fill values
     xx = df['county id'].isna()

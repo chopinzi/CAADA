@@ -3,6 +3,7 @@ This module contains functions to read Caltrans PEMS station data and metadata f
 """
 
 import pandas as pd
+import sys
 
 from ..caada_typing import pathlike as _pathlike
 
@@ -41,7 +42,11 @@ def read_pems_station_meta(filename: _pathlike) -> pd.DataFrame:
         A dataframe, indexed by site ID, containing the metadata from the requested file.
 
     """
-    df = pd.read_csv(filename, sep='\t')
+    try:
+        df = pd.read_csv(filename, sep='\t')
+    except pd.errors.ParserError as err:
+        print('Error parsing metadata file: {}'.format(filename), file=sys.stderr)
+        raise
     df.set_index('ID', inplace=True)
     df.rename(columns=lambda s: s.lower(), inplace=True)
     return df
