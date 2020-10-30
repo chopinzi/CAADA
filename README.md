@@ -1,5 +1,7 @@
 # CAADA - COVID Atmospheric Ancillary Data Agglomerator
 
+[![DOI](https://zenodo.org/badge/277681678.svg)](https://zenodo.org/badge/latestdoi/277681678)
+
 ## Documentation
 
 Full documentation is available at https://joshua-laughner.github.io/CAADA/.
@@ -10,7 +12,9 @@ Only the `master` branch is intended for public use. All other branches represen
 work in progress and should not be relied on. 
 
 If you use CAADA in a publication, you must cite it using the DOI listed above. 
-A suggested citation is:
+A suggested citation is (replacing *vX* with the proper version tag):
+
+J.L. Laughner. *COVID Atmospheric Ancillary Data Agglomerator, vX*. DOI: 10.5281/zenodo.3386652
 
 ## Quickstart (Expert)
 
