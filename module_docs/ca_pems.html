@@ -37,7 +37,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="EIA package API" href="eia.html" />
-    <link rel="prev" title="Welcome to CAADA’s documentation!" href="../index.html" /> 
+    <link rel="prev" title="CAADA Package Structure" href="../package_structure.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -82,7 +82,27 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption"><span class="caption-text">Introduction:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../package_structure.html">CAADA Package Structure</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">CA PEMS package API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-caada.ca_pems.agglomeration">Module: agglomeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-caada.ca_pems.exceptions">Module: exceptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-caada.ca_pems.files">Module: files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-caada.ca_pems.metadata">Module: metadata</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-caada.ca_pems.readers">Module: readers</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eia.html">EIA package API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="epa.html">EPA (CEMS) package API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="opensky.html">OpenSky package API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shipping.html">Shipping package API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="streetlight.html">Streetlight package API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../caada_cl.html">Command line tool</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API documentation:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">CA PEMS package API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-caada.ca_pems.agglomeration">Module: agglomeration</a></li>
@@ -93,6 +113,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="eia.html">EIA package API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="epa.html">EPA (CEMS) package API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="opensky.html">OpenSky package API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="shipping.html">Shipping package API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="streetlight.html">Streetlight package API</a></li>
@@ -141,6 +162,8 @@
   <ul class="wy-breadcrumbs">
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../package_structure.html">CAADA Package Structure</a> &raquo;</li>
         
       <li>CA PEMS package API</li>
     
@@ -209,6 +232,12 @@ currently implemented.</p></li>
 <div class="section" id="module-caada.ca_pems.exceptions">
 <span id="module-exceptions"></span><h2>Module: exceptions<a class="headerlink" href="#module-caada.ca_pems.exceptions" title="Permalink to this headline">¶</a></h2>
 <p>This module contains custom exceptions specific to Caltrans PEMS data.</p>
+<dl class="py exception">
+<dt id="caada.ca_pems.exceptions.NoSiteMetadataError">
+<em class="property">exception </em><code class="sig-prename descclassname">caada.ca_pems.exceptions.</code><code class="sig-name descname">NoSiteMetadataError</code><a class="headerlink" href="#caada.ca_pems.exceptions.NoSiteMetadataError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Error type to use if no metadata can be found for a site</p>
+</dd></dl>
+
 <dl class="py exception">
 <dt id="caada.ca_pems.exceptions.SiteMetadataError">
 <em class="property">exception </em><code class="sig-prename descclassname">caada.ca_pems.exceptions.</code><code class="sig-name descname">SiteMetadataError</code><a class="headerlink" href="#caada.ca_pems.exceptions.SiteMetadataError" title="Permalink to this definition">¶</a></dt>
@@ -397,7 +426,7 @@ will have a corresponding row in the returned dataframe.</p></li>
         <a href="eia.html" class="btn btn-neutral float-right" title="EIA package API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to CAADA’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../package_structure.html" class="btn btn-neutral float-left" title="CAADA Package Structure" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

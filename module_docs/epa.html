@@ -1,0 +1,344 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>EPA (CEMS) package API &mdash; COVID Atmospheric Ancillary Data Agglomerator (CAADA)  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="OpenSky package API" href="opensky.html" />
+    <link rel="prev" title="EIA package API" href="eia.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> COVID Atmospheric Ancillary Data Agglomerator (CAADA)
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Introduction:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../package_structure.html">CAADA Package Structure</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ca_pems.html">CA PEMS package API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eia.html">EIA package API</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">EPA (CEMS) package API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-caada.epa_cems.readers">Module: readers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-caada.epa_cems.web">Module: web</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="opensky.html">OpenSky package API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shipping.html">Shipping package API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="streetlight.html">Streetlight package API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../caada_cl.html">Command line tool</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ca_pems.html">CA PEMS package API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eia.html">EIA package API</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">EPA (CEMS) package API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-caada.epa_cems.readers">Module: readers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-caada.epa_cems.web">Module: web</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="opensky.html">OpenSky package API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shipping.html">Shipping package API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streetlight.html">Streetlight package API</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">COVID Atmospheric Ancillary Data Agglomerator (CAADA)</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../package_structure.html">CAADA Package Structure</a> &raquo;</li>
+        
+      <li>EPA (CEMS) package API</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/module_docs/epa.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="epa-cems-package-api">
+<h1>EPA (CEMS) package API<a class="headerlink" href="#epa-cems-package-api" title="Permalink to this headline">¶</a></h1>
+<p>This package focuses on downloading and reading US EPA Continuous Emissions Monitoring System (CEMS) .csv files. The
+<a class="reference internal" href="#module-caada.epa_cems.web" title="caada.epa_cems.web"><code class="xref py py-mod docutils literal notranslate"><span class="pre">web</span></code></a> module has a class available to download the hourly or daily CEMS files from the EPA FTP
+server. The <a class="reference internal" href="#module-caada.epa_cems.readers" title="caada.epa_cems.readers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">readers</span></code></a> module helps read in these <code class="file docutils literal notranslate"><span class="pre">.csv</span></code> files.</p>
+<div class="section" id="module-caada.epa_cems.readers">
+<span id="module-readers"></span><h2>Module: readers<a class="headerlink" href="#module-caada.epa_cems.readers" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="caada.epa_cems.readers.read_cems_file">
+<code class="sig-prename descclassname">caada.epa_cems.readers.</code><code class="sig-name descname">read_cems_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cems_file</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">drop_units</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="headerlink" href="#caada.epa_cems.readers.read_cems_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a single US EPA CEMS .csv file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cems_file</strong> – The path to the CEMS .csv file to read</p></li>
+<li><p><strong>drop_units</strong> – Whether to remove units from the column names.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dataframe representing the .csv file given as the first argument. The index with be a multiindex with state,
+date, facility_id, and unit_id.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="caada.epa_cems.readers.read_multi_cems_files">
+<code class="sig-prename descclassname">caada.epa_cems.readers.</code><code class="sig-name descname">read_multi_cems_files</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cems_files</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="headerlink" href="#caada.epa_cems.readers.read_multi_cems_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read multiple US EPA CEMS .csv files</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cems_files</strong> – A sequence of paths to CEMS .csv files.</p></li>
+<li><p><strong>kwargs</strong> – Additional keyword arguments to pass to <a class="reference internal" href="#caada.epa_cems.readers.read_cems_file" title="caada.epa_cems.readers.read_cems_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_cems_file()</span></code></a></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dataframe representing all the .csv files given in as arguments. The index with be a multiindex with state,
+date, facility_id, and unit_id. The data will be in the same order as the file names were given.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-caada.epa_cems.web">
+<span id="module-web"></span><h2>Module: web<a class="headerlink" href="#module-caada.epa_cems.web" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="caada.epa_cems.web.EPAFTP">
+<em class="property">class </em><code class="sig-prename descclassname">caada.epa_cems.web.</code><code class="sig-name descname">EPAFTP</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'newftp.epa.gov'</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#caada.epa_cems.web.EPAFTP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class that manages a connection to the EPA FTP server.</p>
+<p>This wraps the standard <code class="xref py py-class docutils literal notranslate"><span class="pre">ftplib.FTP</span></code> class but supplies the URLs by default and contains a helper
+<a class="reference internal" href="#caada.epa_cems.web.EPAFTP.download" title="caada.epa_cems.web.EPAFTP.download"><code class="xref py py-meth docutils literal notranslate"><span class="pre">download()</span></code></a> method to support batch downloading of Continuous Emission Monitoring System (CEMS) files.</p>
+<p>This can be used as a context manager:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">EPAFTP</span><span class="p">()</span> <span class="k">as</span> <span class="n">ftp</span><span class="p">:</span>
+    <span class="n">ftp</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is encouraged because it ensures that the FTP connection is closed whether or not an error occurs.</p>
+<dl class="py method">
+<dt id="caada.epa_cems.web.EPAFTP.download">
+<code class="sig-name descname">download</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time_res</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">start_time</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>datetime.datetime<span class="p">, </span>pandas._libs.tslibs.timestamps.Timestamp<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">stop_time</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>datetime.datetime<span class="p">, </span>pandas._libs.tslibs.timestamps.Timestamp<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">save_dir</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">states</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'all'</span></em>, <em class="sig-param"><span class="n">unzip</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">delete_zip</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#caada.epa_cems.web.EPAFTP.download" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download a collection of EPA CEMS files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time_res</strong> – Which time resolution of files to get. Options are “daily” or “hourly”.</p></li>
+<li><p><strong>start_time</strong> – Beginning and end of the time period to download data for. See Notes, below. This may be any format that
+<code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Timestamp</span></code> recognizes as a valid input.</p></li>
+<li><p><strong>stop_time</strong> – Beginning and end of the time period to download data for. See Notes, below. This may be any format that
+<code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Timestamp</span></code> recognizes as a valid input.</p></li>
+<li><p><strong>save_dir</strong> – Path to save the CEMS files to.</p></li>
+<li><p><strong>states</strong> – Which states to download data for. The string <cite>“all”</cite> will download all states, and <cite>“conus”</cite> will download
+only continental US states. If you want to limit to specific states, pass a sequence of state abbreviations,
+e.g. <cite>(“ca”, “or”, “wa”)</cite>.</p></li>
+<li><p><strong>unzip</strong> – Whether to unzip the .zip files after downloading.</p></li>
+<li><p><strong>delete_zip</strong> – Whether to delete the .zip files after extracting the contained .csv file. Has no effect if <cite>unzip</cite> is
+<cite>False</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Time filtering is done based on the start time of each file. Since the hourly data is organized into monthly
+files and the daily data in organized into quarterly files, a time range from 2020-03-15 to 2020-04-15 would
+download the April 2020 hourly file or Q2 daily file (because April 1, 2020 is the start date for both files),
+however it will <em>not</em> download the March 2020 hourly or Q1 2020 daily file, even though the first part of the
+date range overlaps those files.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="caada.epa_cems.web.download_cl_driver">
+<code class="sig-prename descclassname">caada.epa_cems.web.</code><code class="sig-name descname">download_cl_driver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time_res</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">start_time</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>datetime.datetime<span class="p">, </span>pandas._libs.tslibs.timestamps.Timestamp<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">stop_time</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>datetime.datetime<span class="p">, </span>pandas._libs.tslibs.timestamps.Timestamp<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">save_dir</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'.'</span></em>, <em class="sig-param"><span class="n">unzip</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">delete_zip</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#caada.epa_cems.web.download_cl_driver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download EPA continuous emissions monitoring system data via FTP</p>
+<p>Creates a default <a class="reference internal" href="#caada.epa_cems.web.EPAFTP" title="caada.epa_cems.web.EPAFTP"><code class="xref py py-class docutils literal notranslate"><span class="pre">EPAFTP</span></code></a> connection and downloads CEMS data. All arguments correspond to those for
+<a class="reference internal" href="#caada.epa_cems.web.EPAFTP.download" title="caada.epa_cems.web.EPAFTP.download"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EPAFTP.download()</span></code></a>.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="opensky.html" class="btn btn-neutral float-right" title="OpenSky package API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="eia.html" class="btn btn-neutral float-left" title="EIA package API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Joshua Laughner
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
