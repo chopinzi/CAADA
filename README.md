@@ -1,5 +1,17 @@
 # CAADA - COVID Atmospheric Ancillary Data Agglomerator
 
+## Documentation
+
+Full documentation is available at https://joshua-laughner.github.io/CAADA/.
+
+## Terms of use
+
+Only the `master` branch is intended for public use. All other branches represent
+work in progress and should not be relied on. 
+
+If you use CAADA in a publication, you must cite it using the DOI listed above. 
+A suggested citation is:
+
 ## Quickstart (Expert)
 
 1. Download and install [JLLUtils](https://github.com/joshua-laughner/JLL-Py-Utils)

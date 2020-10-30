@@ -182,7 +182,14 @@ class EPAFTP(ftplib.FTP):
             logger.debug('Deleted {}'.format(zip_path))
 
 
-def download_cl_driver(time_res, start_time, stop_time, save_dir='.', unzip=True, delete_zip=True):
+def download_cl_driver(time_res: str, start_time: datetimelike, stop_time: datetimelike,
+                       save_dir: str = '.', unzip: bool = True, delete_zip: bool = True):
+    """Download EPA continuous emissions monitoring system data via FTP
+
+    Creates a default :class:`EPAFTP` connection and downloads CEMS data. All arguments correspond to those for
+    :meth:`EPAFTP.download`.
+
+    """
     with EPAFTP() as ftp:
         ftp.download(time_res=time_res, start_time=start_time, stop_time=stop_time, save_dir=save_dir,
                      unzip=unzip, delete_zip=delete_zip)
